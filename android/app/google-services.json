@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1079356847253",
+    "project_id": "jadwalku-2abb5",
+    "storage_bucket": "jadwalku-2abb5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1079356847253:android:7d8af63ec077028622d79c",
+        "android_client_info": {
+          "package_name": "com.aajanam.jadwalku"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1079356847253-9ba4mladd1edja1qn9mr9bggbhroi8gr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aajanam.jadwalku",
+            "certificate_hash": "db9fd8ec6d76831c9566ff888d0e3801cd64d499"
+          }
+        },
+        {
+          "client_id": "1079356847253-5epkih8r2bessskdnaf5m0q1r4h476kp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrIQ9aGrc5Q31q8qdMlXfpQie3t-yXxys"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1079356847253-5epkih8r2bessskdnaf5m0q1r4h476kp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

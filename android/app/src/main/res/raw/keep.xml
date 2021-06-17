@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <resources xmlns:tools="http://schemas.android.com/tools"
+        tools:keep="@drawable/*,@raw/ic_launcher"/>
+    <resources xmlns:tools="http://schemas.android.com/tools"
+        tools:keep="@drawable/*,@raw/ic_launcher_round"/>
+</resources>
+
+
+
+
+
