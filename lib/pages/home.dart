@@ -174,11 +174,7 @@ class _HomeState extends State<Home> {
                   child: LegendBar(),
                 ),
                   //SizedBox(width: 5,),
-                  IconButton(icon: Icon(Icons.chevron_right_outlined), iconSize: 32, color: Colors.black54,
-                      onPressed: (){
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProfilePage(0,'', '')));
-                      },),
-                  SizedBox(width: 5,)
+                  SizedBox(width: 25,)
                 ],
                 automaticallyImplyLeading: false,
                 elevation: 0,
@@ -233,7 +229,7 @@ class _HomeState extends State<Home> {
                               formatButtonShowsNext: false,
                             formatButtonTextStyle: TextStyle(color: Colors.black87, fontSize: 13),
                             formatButtonDecoration: BoxDecoration( color: Colors.white10,borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black87)),
-                            formatButtonPadding: EdgeInsets.symmetric(vertical: 1, horizontal: 10),
+                            formatButtonPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 10),
                               headerPadding: EdgeInsets.zero),
                           calendarController: _calendarController,
                         initialCalendarFormat: CalendarFormat.twoWeeks,

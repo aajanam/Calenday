@@ -11,8 +11,8 @@ class PreHome extends StatefulWidget {
 
 class _PreHomeState extends State<PreHome> {
   final List<Widget> _page = [
+    ProfilePage(2,'',''),
     Home(),
-    ProfilePage(2,'','')
   ];
    int _currentPage = 0;
 
@@ -32,12 +32,12 @@ class _PreHomeState extends State<PreHome> {
         selectedItemColor: Colors.teal,
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: 'Calendar',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'My Page',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today),
+            label: 'Calendar',
           ),
         ],
       ),
