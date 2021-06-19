@@ -13,6 +13,7 @@ import 'package:jadwalku/provider/userProvider.dart';
 import 'package:jadwalku/services/auth.dart';
 import 'package:jadwalku/widget/progress_indicator.dart';
 import 'package:jadwalku/widget/show_alert_dialogue.dart';
+import 'package:jadwalku/widget/user_bar.dart';
 import 'package:provider/provider.dart';
 
 
@@ -68,13 +69,16 @@ class ProfilePage extends StatelessWidget {
                   brightness: Brightness.dark,
                   iconTheme: IconThemeData(color: Colors.white),
                   titleSpacing: 0,
-                  //automaticallyImplyLeading: true,
+                  automaticallyImplyLeading: false,
                   backgroundColor: Colors.cyanAccent.shade700,
                   elevation: 0,
-                  title: Text(data.single.displayName, style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),),
+                  title: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                    child: UserBar(color: Colors.white,),
+                  ),
                   actions: [
                     IconButton(
-                      icon: Icon(Icons.login_outlined), iconSize: 28,
+                      icon: Icon(Icons.logout_outlined), iconSize: 28,
                       onPressed: () => _confirmSignOut(context),),
                     SizedBox(width: 10,)
                   ],
@@ -92,24 +96,13 @@ class ProfilePage extends StatelessWidget {
                           )
                       ),
                       child: Column(
-                        //crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            //mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Column(
-                                children: [
-                                  SizedBox(height: 6,),
-
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.all(Radius.circular(15)),
-                                    child: Image.network(data.single.photoUrl,
-                                      scale: 1.7,),
-                                  ),
-                                ],
-                              ),
+                              SizedBox(width: 22,),
                               Column(
                                 children: [
                                   Row(

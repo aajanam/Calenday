@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jadwalku/pages/home.dart';
+import 'package:jadwalku/pages/preHome.dart';
 import 'package:jadwalku/services/auth.dart';
 import 'package:jadwalku/sign_in/sign_in_page.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +22,7 @@ class LandingPage extends StatelessWidget {
             if (user == null) {
               return SignInPage.create(context);
             }
-            return Home();
+            return PreHome();
           } else {
             return Scaffold(
               body: Center(

@@ -82,8 +82,6 @@ class _ColleagueState extends State<Colleague> {
 
             }
 
-             //colleagueIDList = person.colleagues.asMap().values.map((e) => e['collId']).toList();
-
             return  Padding(
                   padding: const EdgeInsets.symmetric(horizontal:15.0, vertical: 10),
                   child: Column(
@@ -144,7 +142,7 @@ class _ColleagueState extends State<Colleague> {
                                 builder: (context) =>
                             Container(
                               child: Padding(
-                                padding: const EdgeInsets.only(bottom: 8.0),
+                                padding:MediaQuery.of(context).viewInsets ,
                                 child: Row(
                                   children: [
                                     Expanded(
@@ -370,8 +368,13 @@ class _ColleagueState extends State<Colleague> {
                                                     shape: RoundedRectangleBorder(
                                                         borderRadius: BorderRadius.vertical(top: Radius.circular(10.0))),
                                                     builder: (context)=> ListView(
+                                                      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                                                       shrinkWrap: true,
                                                       children: [
+                                                        Padding(
+                                                          padding: const EdgeInsets.only( bottom: 10, left: 15),
+                                                          child: Text('Add to / Remove from Group(s) '),
+                                                        ),
                                                         for(var i = 1; i< person.groups.length; i++)
                                                           StatefulBuilder(
                                                               builder: (context, setModalState){
@@ -385,11 +388,11 @@ class _ColleagueState extends State<Colleague> {
                                                                   });
                                                                 }
                                                                 return SingleChildScrollView(
-                                                                  child: ListTile(
-                                                                    contentPadding: EdgeInsets.symmetric(horizontal: 30),
-                                                                    title: Text(person.groups[i], style: TextStyle(fontSize: 14),),
-                                                                    trailing: IconButton(
-                                                                        icon: isInGroup == true ? Icon(Icons.check_box, color: Colors.teal,) : Icon(Icons.check_box_outline_blank),
+                                                                  child: Row(
+                                                                    //contentPadding: EdgeInsets.symmetric(horizontal: 30),
+                                                                    children: [
+                                                                    IconButton(
+                                                                        icon: isInGroup == true ? Icon(Icons.check_box, color: Colors.teal,) : Icon(Icons.check_box_outline_blank, color: Colors.grey,),
                                                                         onPressed: (){
                                                                           if (!item['group'].contains(person.groups[i])) {
                                                                             item['group'].add(person.groups[i]);
@@ -407,6 +410,7 @@ class _ColleagueState extends State<Colleague> {
                                                                           }
                                                                         }
                                                                     ),
+                                                                    Text(person.groups[i], style: TextStyle(fontSize: 14),),]
                                                                   ),
                                                                 );}
                                                           )],

@@ -45,6 +45,7 @@ class _HomeState extends State<Home> {
   String _status;
 
 
+
   List<int> bookTimeOT = [];
 
 
@@ -181,11 +182,7 @@ class _HomeState extends State<Home> {
                 ],
                 automaticallyImplyLeading: false,
                 elevation: 0,
-                title:   GestureDetector(
-                    onTap: (){
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProfilePage(0,'', '')));
-                    },
-                    child: UserBar()),
+                title:   UserBar(color: Colors.black),
 
               ),
               floatingActionButton: (youGotMessage == true && messageId != null) ?

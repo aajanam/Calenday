@@ -35,7 +35,7 @@ class _PhotoGalleryState extends State<PhotoGallery> {
   Widget build(BuildContext context) {
     final List doc = widget.carouselList.toList();
     return Scaffold(
-      extendBodyBehindAppBar: true,
+      extendBodyBehindAppBar: false,
       backgroundColor: Colors.black,
         appBar: AppBar(
           titleSpacing: 0,
@@ -48,9 +48,9 @@ class _PhotoGalleryState extends State<PhotoGallery> {
 
                       },),
           title:ListTile(
-            title:  widget.event == null? Text(''): Text(widget.event.diagnose, style: TextStyle(fontSize: 16,color: Colors.white),),
+            title:  widget.event == null? Text(''): Text(widget.event.diagnose, style: TextStyle(fontSize: 16,color: Colors.white), overflow: TextOverflow.ellipsis,),
             subtitle: widget.event == null? Text(''): Transform.translate(
-                offset: Offset(0,-5),
+                offset: Offset(0,-3),
                 child: Text(widget.event.procedure, style: TextStyle(fontSize: 12,color: Colors.white),)),
           ),
           backgroundColor: Colors.transparent,
