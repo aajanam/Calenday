@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:date_format/date_format.dart';
 import 'package:flutter/foundation.dart';
@@ -184,7 +185,7 @@ class UnfinishedTab extends StatelessWidget {
                                           snapshot.data[index].procedure,
                                           style: TextStyle(
                                               fontSize: 14,
-                                              fontWeight: FontWeight.w600),
+                                              fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis,
                                         ),
                                         subtitle: Transform.translate(
                                           offset: Offset(0,-5),
@@ -192,7 +193,7 @@ class UnfinishedTab extends StatelessWidget {
                                             snapshot.data[index].diagnose,
                                             style: TextStyle(
                                               fontSize: 13,
-                                            ),
+                                            ),overflow: TextOverflow.ellipsis
                                           ),
                                         ),
                                         description: Transform.translate(
@@ -201,7 +202,7 @@ class UnfinishedTab extends StatelessWidget {
                                             snapshot.data[index].place,
                                             style: TextStyle(
                                               fontSize: 12,
-                                            ),
+                                            ), overflow: TextOverflow.ellipsis
                                           ),
                                         ),
                                         icon: IconButton(

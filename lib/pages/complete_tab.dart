@@ -75,13 +75,13 @@ class CompleteTab extends StatelessWidget {
                                   margin: EdgeInsets.zero,
 
                                   //padding: EdgeInsets.zero,
-                                  title: Text(snapshot.data[index].procedure, style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600, color: Colors.black54),),
+                                  title: Text(snapshot.data[index].procedure, style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600, color: Colors.black54),overflow: TextOverflow.ellipsis),
                                   subtitle: Transform.translate(
                                       offset: Offset(0,-5),
-                                      child: Text(snapshot.data[index].diagnose, style: TextStyle(fontSize: 13, color: Colors.black54),)),
+                                      child: Text(snapshot.data[index].diagnose, style: TextStyle(fontSize: 13, color: Colors.black54),overflow: TextOverflow.ellipsis)),
                                   description: Transform.translate(
                                       offset: Offset(0,-8),
-                                      child: Text(snapshot.data[index].place, style: TextStyle(fontSize: 12, color: Colors.black54),)),
+                                      child: Text(snapshot.data[index].place, style: TextStyle(fontSize: 12, color: Colors.black54),overflow: TextOverflow.ellipsis)),
                                   icon: IconButton(
                                     onPressed: () {
                                       Navigator.of(context).push(MaterialPageRoute(builder: (context) => EventForm(event: snapshot.data[index], date: date,)));
