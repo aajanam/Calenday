@@ -45,6 +45,24 @@ class UnfinishedTab extends StatelessWidget {
                     children: [
                       Row(
                         children: [
+                          Text('Total :', style: TextStyle(fontSize: 12, color: Colors.black54),),
+                          SizedBox(width: 6,),
+                          Container(
+                              constraints: BoxConstraints(
+                                minWidth: 12,
+                                minHeight: 12,),
+                              padding: EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+
+                                shape: BoxShape.circle,
+                                color: Colors.teal.shade700,
+                              ),
+                              child: Text('$total', style: TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.w600),))
+                        ],
+                      ),
+                      SizedBox(width: 8,),
+                      Row(
+                        children: [
                           Text('Yours :', style: TextStyle(fontSize: 12, color: Colors.black54),),
                           SizedBox(width: 6,),
                           Container(
@@ -117,7 +135,6 @@ class UnfinishedTab extends StatelessWidget {
                                               date: date,)));
                               },
                               child: Card(
-
                                 margin: EdgeInsets.symmetric(
                                   vertical: 3,
                                 ),
