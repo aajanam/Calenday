@@ -29,7 +29,8 @@ class _PreHomeState extends State<PreHome> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentPage,
         onTap: selectPage,
-        selectedItemColor: Colors.teal,
+        selectedItemColor: Colors.teal.shade700,
+        unselectedItemColor: Colors.black38,
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.person),

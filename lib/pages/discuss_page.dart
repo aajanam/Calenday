@@ -1,4 +1,4 @@
-//import 'package:admob_flutter/admob_flutter.dart';
+import 'package:admob_flutter/admob_flutter.dart';
 import 'package:bubble/bubble.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_format/date_format.dart';
@@ -91,14 +91,14 @@ class _DiscussPageState extends State<DiscussPage> {
 
           children: [
             SizedBox(height: 5,),
-            /*Container(
+            Container(
               color:Colors. lightBlue.shade100.withOpacity(0.1),
               child: Center(
                 child: AdmobBanner(
                     adUnitId: ads.getBannerAdId(),
                     adSize: AdmobBannerSize.BANNER),
               ),
-            ),*/
+            ),
             Container(
               margin: EdgeInsets.all(8),
               decoration: BoxDecoration(

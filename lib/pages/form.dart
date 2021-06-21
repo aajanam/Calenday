@@ -25,6 +25,7 @@ import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:path/path.dart' as Path;
+import 'package:rich_text_controller/rich_text_controller.dart';
 //import 'package:rich_text_controller/rich_text_controller.dart';
 
 
@@ -68,7 +69,7 @@ class _EventFormState extends State<EventForm> {
   TextEditingController dateController = TextEditingController();
   TextEditingController _placeController = TextEditingController();
   TextEditingController _procedureController = TextEditingController();
-  //RichTextController _noteController;
+  RichTextController _noteController;
   Map<RegExp, TextStyle> patternUser = {
     RegExp(r"\B@[a-zA-Z0-9]+\b"):
     TextStyle(color: Colors.teal, fontSize: 12, fontWeight: FontWeight.bold)
@@ -127,11 +128,11 @@ class _EventFormState extends State<EventForm> {
       //Add
       event.loadAll(null);
     }
-  /*  _noteController = RichTextController(
+    _noteController = RichTextController(
       text: event.finalNotes,
       patternMap: patternUser,
 
-    );*/
+    );
     super.initState();
   }
 
@@ -140,7 +141,7 @@ class _EventFormState extends State<EventForm> {
    dateController.dispose();
    _placeController.dispose();
    _procedureController.dispose();
-   //_noteController.dispose();
+   _noteController.dispose();
     super.dispose();
   }
 
@@ -797,7 +798,7 @@ class _EventFormState extends State<EventForm> {
                                     TextFormField(
                                       textCapitalization: TextCapitalization.sentences,
                                       keyboardType: TextInputType.multiline,
-                                      //controller: _noteController,
+                                      controller: _noteController,
                                       style: TextStyle(color: Colors.black, fontSize: 15),
                                       decoration:
                                       InputDecoration(
@@ -809,12 +810,12 @@ class _EventFormState extends State<EventForm> {
                                       maxLines: null,
                                       //initialValue: _noteController.text,
                                       onChanged: (val) {
-                                        /*var editor = Auth().currentUser.displayName.substring(0, Auth().currentUser.displayName.lastIndexOf(' ')).toLowerCase().trim();
+                                        var editor = Auth().currentUser.displayName.substring(0, Auth().currentUser.displayName.lastIndexOf(' ')).toLowerCase().trim();
                                         if(_noteController.text.contains('@$editor'))
                                           {val = '$val';}
                                         else {
                                                 val = '@$editor;  $val';
-                                              }*/
+                                              }
                                               return event.changeFinalNotes = val;
                                       }, //experimental
                                       textInputAction: TextInputAction.next,
