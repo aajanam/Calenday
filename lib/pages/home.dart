@@ -398,7 +398,8 @@ class _HomeState extends State<Home> {
   WeekView buildDayView(AsyncSnapshot<List<Events>> snapshot,
       BuildContext context, DateTime now, Color color1, Color color2, Color textColor,double columnWidth) {
     DateTime date = DateTime(_selectedDay.year, _selectedDay.month, _selectedDay.day);
-    //var list = [date.subtract(Duration(days: 1)), date, date.add(Duration(days: 1))];
+    var now = DateTime.now();
+    var today = DateTime(now.year, now.month, now.day);
     var todayEvent = snapshot.data.where((element) => DateTime.parse(element.date).isAtSameMomentAs(DateTime(now.year, now.month, now.day)) && element.participants.any((element) => element['id'] == Auth().currentUser.uid)).map((e) => e.startHour).toList();
     todayEvent.sort();
     getBookedTime(snapshot, date);
@@ -412,7 +413,6 @@ class _HomeState extends State<Home> {
             currentTimeCirclePosition: CurrentTimeCirclePosition.left,
             currentTimeCircleColor: Colors.pink),
         style: WeekViewStyle(
-         // dayViewSeparatorColor: Colors.grey,
           dayViewWidth: MediaQuery.of(context).size.width*0.68,
           dayViewSeparatorWidth: 0.8, ),
         initialTime: _selectedDay.isAtSameMomentAs(now)  && todayEvent.isNotEmpty ? HourMinute(hour: todayEvent[0]).atDate(now) : HourMinute(hour: time - 1).atDate(_selectedDay),
@@ -434,10 +434,11 @@ class _HomeState extends State<Home> {
 
         dayBarStyleBuilder: (tgl) => DayBarStyle(
           decoration: BoxDecoration(border: Border.symmetric(vertical: BorderSide(color: Colors.grey.shade400.withOpacity(0.8), width: 0.5), horizontal: BorderSide.none),color:  Colors.grey.shade200.withOpacity(0.9),),
-          textStyle: TextStyle(fontWeight: tgl == _selectedDay ? FontWeight.w600 : null, color: tgl == _selectedDay ? Colors.teal.shade800 : null, fontSize: 12),
+          textStyle: TextStyle(fontWeight: tgl == _selectedDay ? FontWeight.w600 : null, color: tgl == _selectedDay ? Colors.teal.shade800 : null, fontSize: tgl == today ? 16: 12),
 
             textAlignment: tgl != _selectedDay? Alignment.centerLeft : Alignment.center,
-            dateFormatter: (day, month,year) => formatDate(tgl, ['dd','  ', 'M','  ', 'yyyy'])
+            dateFormatter: tgl != today ? (day, month,year) {return formatDate(tgl, ['dd','  ', 'M','  ', 'yyyy']);}
+            :  (day, month,year) => 'TODAY'
         ),
         inScrollableWidget: true,
         hoursColumnTimeBuilder: (style, hour) {

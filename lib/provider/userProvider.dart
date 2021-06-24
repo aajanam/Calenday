@@ -1,4 +1,3 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:jadwalku/model/users.dart';
 import 'package:jadwalku/services/auth.dart';
@@ -210,10 +209,10 @@ class UserProvider with ChangeNotifier {
     return nameSearchList;
   }
 
-  Future getToken() async {
+  /*Future getToken() async {
     await FirebaseMessaging.instance.getToken().then((token) => deviceToken = token);
     return deviceToken;
-  }
+  }*/
   Future getPlayerId() async {
     var status = await OneSignal.shared.getPermissionSubscriptionState();
     deviceToken = status.subscriptionStatus.userId;

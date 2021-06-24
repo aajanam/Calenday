@@ -375,10 +375,10 @@ class _ColleagueState extends State<Colleague> {
                                                           padding: const EdgeInsets.only( bottom: 10, left: 15),
                                                           child: Text('Add to / Remove from Group(s) '),
                                                         ),
-                                                        for(var i = 1; i< person.groups.length; i++)
+                                                        for(var i in person.groups)
                                                           StatefulBuilder(
                                                               builder: (context, setModalState){
-                                                                if(item['group'].contains(person.groups[i])){
+                                                                if(item['group'].contains(i)){
                                                                   setModalState(() {
                                                                     isInGroup = true;
                                                                   });
@@ -388,21 +388,21 @@ class _ColleagueState extends State<Colleague> {
                                                                   });
                                                                 }
                                                                 return SingleChildScrollView(
-                                                                  child: Row(
+                                                                  child: i != 'All' ? Row(
                                                                     //contentPadding: EdgeInsets.symmetric(horizontal: 30),
                                                                     children: [
                                                                     IconButton(
                                                                         icon: isInGroup == true ? Icon(Icons.check_box, color: Colors.teal,) : Icon(Icons.check_box_outline_blank, color: Colors.grey,),
                                                                         onPressed: (){
-                                                                          if (!item['group'].contains(person.groups[i])) {
-                                                                            item['group'].add(person.groups[i]);
+                                                                          if (!item['group'].contains(i)) {
+                                                                            item['group'].add(i);
                                                                             person.setUser();
                                                                             setModalState(() {
                                                                               isInGroup = true;
                                                                             });
                                                                           }
-                                                                          else if (item['group'].contains(person.groups[i])){
-                                                                            item['group'].removeAt(i);
+                                                                          else if (item['group'].contains(i)){
+                                                                            item['group'].remove(i);
                                                                             person.setUser();
                                                                             setModalState(() {
                                                                               isInGroup = false;
@@ -410,8 +410,8 @@ class _ColleagueState extends State<Colleague> {
                                                                           }
                                                                         }
                                                                     ),
-                                                                    Text(person.groups[i], style: TextStyle(fontSize: 14),),]
-                                                                  ),
+                                                                    Text(i, style: TextStyle(fontSize: 14),),]
+                                                                  ): Container(),
                                                                 );}
                                                           )],
                                                     ));
