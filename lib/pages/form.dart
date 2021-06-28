@@ -315,7 +315,7 @@ class _EventFormState extends State<EventForm> {
                 ),
                 appBar: AppBar(
                   brightness: Brightness.dark,
-                  backgroundColor: Colors.cyan.shade600,
+                  backgroundColor: Color.fromRGBO(77, 116, 99, 0.9),
                   titleSpacing: 0,
                   title: widget.event != null && event.creatorId == Auth().currentUser.uid
                       ? Text('Edit Event', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600),) : widget.event != null && event.creatorId != Auth().currentUser.uid
@@ -373,7 +373,7 @@ class _EventFormState extends State<EventForm> {
                                                   color: Colors.white,iconSize: 28,
                                 onPressed:  widget != null && _placeController.text.length > 2 && _procedureController.text.length > 2  ?(){
                                   Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-                                  Participants(regUser: owner, event: widget.event, participants: participants, procedure: _procedureController.text, place: _placeController.text, date:dateController.text, isDone: isDone,)));
+                                  Participants(regUser: owner, event: widget.event, participants: participants, procedure: _procedureController.text, place: _placeController.text, date:selDate.toString(), isDone: isDone,)));
                                 }: null,),)
                           ),
                         ]
@@ -401,9 +401,12 @@ class _EventFormState extends State<EventForm> {
                                   color: event.participants.where((element) => element['id'] == Auth().currentUser.uid).firstOrNull['hour'] == 24 ? Colors.cyan.shade600: Colors.transparent,
                                 ),
                                   width: MediaQuery.of(context).size.width,
-                                  child: Text('1 day before',
-                                    style: TextStyle(color:event.participants.where((element) => element['id'] == Auth().currentUser.uid).firstOrNull['hour'] == 24 ? Colors.white : Colors.black54,  fontSize: 15 ),
-                                    textAlign:  event.participants.where((element) => element['id'] == Auth().currentUser.uid).firstOrNull['hour'] == 24 ? TextAlign.center : TextAlign.start,)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical:8.0),
+                                    child: Text('1 day before',
+                                      style: TextStyle(color:event.participants.where((element) => element['id'] == Auth().currentUser.uid).firstOrNull['hour'] == 24 ? Colors.white : Colors.black54,  fontSize: 15 ),
+                                      textAlign:  event.participants.where((element) => element['id'] == Auth().currentUser.uid).firstOrNull['hour'] == 24 ? TextAlign.center : TextAlign.start,),
+                                  )),
                             ) : null,
                             (selDate.add(Duration(hours: event.startHour)).isAfter(DateTime.now().add(Duration(hours: 6)))) ?PopupMenuItem(
                               value: 6,
@@ -412,9 +415,12 @@ class _EventFormState extends State<EventForm> {
                                     color: event.participants.where((element) => element['id'] == Auth().currentUser.uid).firstOrNull['hour'] == 6 ? Colors.cyan.shade600 : Colors.transparent,
                                   ),
                                   width: MediaQuery.of(context).size.width,
-                                  child: Text('6 hours before',
-                                    style: TextStyle(color:event.participants.where((element) => element['id'] == Auth().currentUser.uid).firstOrNull['hour'] == 6 ? Colors.white : Colors.black54 , fontSize: 15),
-                                    textAlign:  event.participants.where((element) => element['id'] == Auth().currentUser.uid).firstOrNull['hour'] == 6 ? TextAlign.center : TextAlign.start,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical:8.0),
+                                    child: Text('6 hours before',
+                                      style: TextStyle(color:event.participants.where((element) => element['id'] == Auth().currentUser.uid).firstOrNull['hour'] == 6 ? Colors.white : Colors.black54 , fontSize: 15),
+                                      textAlign:  event.participants.where((element) => element['id'] == Auth().currentUser.uid).firstOrNull['hour'] == 6 ? TextAlign.center : TextAlign.start,
+                                    ),
                                   )),
                             ) : null,
                             PopupMenuItem(
@@ -424,9 +430,12 @@ class _EventFormState extends State<EventForm> {
                                     color: event.participants.where((element) => element['id'] == Auth().currentUser.uid).firstOrNull['hour'] == 2 ? Colors.cyan.shade600 : Colors.transparent,
                                   ),
                                 width: MediaQuery.of(context).size.width,
-                                  child: Text('2 hours before',
-                                    style: TextStyle(color:event.participants.where((element) => element['id'] == Auth().currentUser.uid).firstOrNull['hour'] == 2 ? Colors.white : Colors.black54, fontSize: 15 ),
-                                    textAlign:  event.participants.where((element) => element['id'] == Auth().currentUser.uid).firstOrNull['hour'] == 2 ? TextAlign.center : TextAlign.start,)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical:8.0),
+                                    child: Text('2 hours before',
+                                      style: TextStyle(color:event.participants.where((element) => element['id'] == Auth().currentUser.uid).firstOrNull['hour'] == 2 ? Colors.white : Colors.black54, fontSize: 15 ),
+                                      textAlign:  event.participants.where((element) => element['id'] == Auth().currentUser.uid).firstOrNull['hour'] == 2 ? TextAlign.center : TextAlign.start,),
+                                  )),
                             ),
                           ],
                         onSelected: (int menu){
@@ -904,6 +913,7 @@ class _EventFormState extends State<EventForm> {
       playIds.add(snapshot.data.where((element) => element.uid == i['id']).first.deviceToken);
     }
      for (var playId in playIds){
+       print(playId);
     if (playId != null) {
       sendMessage(playId, '${owner.displayName} $action', '${dateController.text}: ${_procedureController.text} at ${_placeController.text}', selDate.toString(), '$startHour');
         }
@@ -1076,9 +1086,9 @@ class _EventFormState extends State<EventForm> {
         selectedAssets: images,
         cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
         materialOptions: MaterialOptions(
-          statusBarColor: "#00BCD4" ,
-          lightStatusBar: true,
-          actionBarColor: "#00BCD4",
+          statusBarColor: "#4D7463" ,
+          lightStatusBar: false,
+          actionBarColor: "#4D7463",
           actionBarTitle: "Pick images",
           allViewTitle: "All Photos",
           useDetailsView: false,

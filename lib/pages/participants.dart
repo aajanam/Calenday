@@ -1,9 +1,11 @@
 import 'dart:ui';
 
+import 'package:date_format/date_format.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:jadwalku/model/events.dart';
 import 'package:jadwalku/model/users.dart';
+import 'package:jadwalku/pages/colleague.dart';
 import 'package:jadwalku/pages/profile.dart';
 import 'package:jadwalku/provider/events_provider.dart';
 import 'package:jadwalku/provider/userProvider.dart';
@@ -41,11 +43,12 @@ class _ParticipantsState extends State<Participants> {
   List colleagueIDList = [];
   List userWhoHaveMyId = [];
 
-  Future sendMessage(playerId, messageTitle, messageBody) async {
+  Future sendMessage(playerId, messageTitle, messageBody, collapseID) async {
     await OneSignal.shared.postNotification(OSCreateNotification(
         playerIds: [playerId],
         content: messageBody,
         heading: messageTitle,
+        collapseId:collapseID,
         sendAfter: DateTime.now().add(Duration(seconds: 30)).toUtc(),
       androidSmallIcon: 'ic_launcher',
       androidLargeIcon: 'ic_launcher_round'
@@ -78,6 +81,7 @@ class _ParticipantsState extends State<Participants> {
   Widget build(BuildContext context) {
     final event = Provider.of<EventProvider>(context);
     final person = Provider.of<UserProvider>(context);
+    print(widget.date);
     return StreamBuilder<List<RegUser>>(
         stream: person.users,
         builder: (context, snapshot) {
@@ -106,13 +110,15 @@ class _ParticipantsState extends State<Participants> {
 
             return  Scaffold(
               appBar: AppBar(
+                brightness: Brightness.dark,
+                backgroundColor: Color.fromRGBO(77, 116, 99, 0.9),
                 actions: [
                   person.colleagues.length > 0 /*|| person.colleagues != null*/ ? TextButton.icon(
 
                     icon: Icon(Icons.book_outlined, size: 28, color: Colors.white,),
                       onPressed: (){
                         Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-                            ProfilePage(3, person.displayName, '')));
+                            Colleague()));
                       },
                       label: Text('Colleagues', style: TextStyle(color: Colors.white),)) : Container(),
                   SizedBox(width: 25,)
@@ -127,7 +133,8 @@ class _ParticipantsState extends State<Participants> {
                           sendMessage(
                             i,
                             '${person.displayName} invites you',
-                            '${widget.date} : ${widget.procedure} at ${widget.place}',);
+                            '${formatDate(DateTime.parse(widget.date), ['dd', ' ', 'M', ' ', 'yyyy'])} : ${widget.procedure} at ${widget.place}',
+                          '${widget.date}');
 
                       }
                     }
@@ -136,7 +143,7 @@ class _ParticipantsState extends State<Participants> {
                   },
                 ),
                 elevation: 0,
-                title: Text('Participants', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                title: Text('Participants', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                 titleSpacing: 0,
               ),
               body: Padding(
@@ -177,6 +184,7 @@ class _ParticipantsState extends State<Participants> {
                                             playIds = playIds.toSet().toList();
                                             if(widget.event != null){
                                               event.saveEvent();
+                                              print(playIds);
                                             }
                                           }
                                         }
@@ -343,6 +351,7 @@ class _ParticipantsState extends State<Participants> {
 
                                       if(widget.event != null){
                                         event.saveEvent();
+                                        print(playIds);
                                       }
                                     },
                                     child:
@@ -385,29 +394,6 @@ class _ParticipantsState extends State<Participants> {
                                     Chip(label: Text('Invite'), padding: EdgeInsets.symmetric(vertical: 0, horizontal: 8),
                                       labelStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 10),
                                       backgroundColor: Colors.teal.shade400,)),
-
-                              /*IconButton(
-                                  icon: Icon(Icons.add_circle),
-                                  color: Colors.teal,
-                                  iconSize: 28,
-                                  onPressed: () {
-                                    setState(() {
-                                      var val = {'id': snapshot.data.where((element) => element.uid == item['collId']).single.uid,
-                                        'notifyStat': false,
-                                        'hour': null};
-                                      widget.participants.add(val);
-                                      event.changeParticipants = widget.participants;
-                                    });
-                                    if (snapshot.data.where((element) => element.uid == item['collId']).first.deviceToken != null) {
-                                      playIds.add(snapshot.data.where((element) => element.uid == item['collId']).first.deviceToken);
-                                    }
-                                    playIds = playIds.toSet().toList();
-
-                                    if(widget.event != null){
-                                      event.saveEvent();
-                                    }
-                                  },
-                                ),*/
                               ) : Container()]
           )),
                   ],

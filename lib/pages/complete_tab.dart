@@ -23,41 +23,10 @@ class CompleteTab extends StatelessWidget {
         stream: event.completedEvents,
         builder: (context, snapshot) {
           if(!snapshot.hasData){return Indicator();}
-          var total = snapshot.data.where((element) => element.participants.any((e) => e['id'] == Auth().currentUser.uid &&
-              element.isDone == true))
-              .length;
+
           return Column(
 
             children: [
-              Container(
-                //color: Colors.blue.shade400,
-                height: 45,
-                child:
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        Text('Total Completed Events :', style: TextStyle(fontSize: 12, color: Colors.black54),),
-                        SizedBox(width: 6,),
-                        Container(
-                            constraints: BoxConstraints(
-                              minWidth: 12,
-                              minHeight: 12,),
-                            padding: EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-
-                              shape: BoxShape.circle,
-                              color: Colors.brown,
-                            ),
-                            child: Text('$total', style: TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.w600),))
-                      ],
-                    ),
-                    SizedBox(width: 8,),
-                  ],
-                ),
-              ),
               Expanded(
                 child: Scrollbar(
                   thickness: 5,

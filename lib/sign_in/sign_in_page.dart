@@ -48,9 +48,7 @@ class SignInPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body:_buildContent(context),
-      backgroundColor: Colors.grey[200],
     );
   }
 
@@ -58,7 +56,7 @@ class SignInPage extends StatelessWidget {
     return Container(decoration: BoxDecoration(
       gradient: LinearGradient(
         colors: [
-          Colors.cyanAccent.shade700,
+          Color.fromRGBO(77, 116, 99, 0.9),
           Colors.cyan.shade100,
         ],
         begin: Alignment.bottomRight,
@@ -83,7 +81,9 @@ class SignInPage extends StatelessWidget {
             ),
             SizedBox(height: 30.0),
             (isLoading) ? Center(
-              child: LinearProgressIndicator(backgroundColor: Colors.orangeAccent,),)
+              child: LinearProgressIndicator(
+                color: Color.fromRGBO(240, 213, 176, 0.9),
+                backgroundColor: Color.fromRGBO(119, 92, 82, 0.9),),)
                 : Container(height: 8,),
 
           ],
@@ -101,7 +101,7 @@ class SignInPage extends StatelessWidget {
           style: TextStyle(
             fontSize: 36.0,
             fontWeight: FontWeight.w600,
-            color: Colors.indigo.shade600,
+            color: Color.fromRGBO(115, 92, 82, 1),
           ),
         ),
       ],

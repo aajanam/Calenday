@@ -17,7 +17,7 @@ class LegendBar extends StatelessWidget {
                 children: [
                   CircleAvatar(radius: 6, backgroundColor: Colors.teal.shade300,),
                   SizedBox(width: 2,),
-                  Text('Yours', style: TextStyle(fontSize: 10,color: Colors.black),)
+                  Text('Yours', style: TextStyle(fontSize: 10,color: Colors.white),)
                 ],
               ),
               SizedBox(width: 8,),
@@ -25,7 +25,7 @@ class LegendBar extends StatelessWidget {
                 children: [
                   CircleAvatar(radius: 6, backgroundColor: Colors.amberAccent,),
                   SizedBox(width: 2,),
-                  Text('Shared', style: TextStyle(fontSize: 10,color: Colors.black),)
+                  Text('Shared', style: TextStyle(fontSize: 10,color: Colors.white),)
                 ],
               ),
             ],
@@ -38,7 +38,7 @@ class LegendBar extends StatelessWidget {
               children: [
                 CircleAvatar(radius: 6, backgroundColor: Colors.brown.shade300,),
                 SizedBox(width: 2,),
-                Text('Done', style: TextStyle(fontSize: 10,color: Colors.black),),
+                Text('Done', style: TextStyle(fontSize: 10,color: Colors.white),),
               ],
             ),
           ),

@@ -17,7 +17,6 @@ import 'package:jadwalku/services/admob.dart';
 import 'package:jadwalku/services/auth.dart';
 import 'package:jadwalku/widget/legend_bar.dart';
 import 'package:jadwalku/widget/progress_indicator.dart';
-import 'package:jadwalku/widget/user_bar.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:provider/provider.dart';
@@ -35,8 +34,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   RegUser user;
-  String messageTitle = '';
-  String messageContent = '';
+
   int count = 0;
   int time = 6;
   String messageId;
@@ -66,51 +64,6 @@ class _HomeState extends State<Home> {
   void initState()  {
 
 
-    OneSignal.shared.setInFocusDisplayType(OSNotificationDisplayType.notification);
-    OneSignal.shared.setNotificationReceivedHandler((OSNotification notification) {
-      // will be called whenever a notification is received
-      setState(() {
-        messageTitle = notification.payload.title;
-        messageContent = notification.payload.body;
-        if (notification.payload.additionalData['id'] != null) {
-          messageId = notification.payload.additionalData['id'];
-          youGotMessage = true;
-        }
-        if(notification.payload.additionalData['name'] != null){
-          collName = notification.payload.additionalData['name'];
-        }
-        if(notification.payload.additionalData['name'] != null && notification.payload.additionalData['status'] != null){
-          collName = notification.payload.additionalData['name'];
-          _status = notification.payload.additionalData['status'];
-        }
-
-      });
-      notification.displayType = OSNotificationDisplayType.notification;
-    });
-
-    OneSignal.shared.setNotificationOpenedHandler((OSNotificationOpenedResult result) async {
-      result.notification.displayType = OSNotificationDisplayType.notification;
-
-      // will be called whenever a notification is opened/button pressed.
-      setState(() {
-        _calendarController.setSelectedDay(DateTime.parse(result.notification.payload.collapseId));
-        _calendarController.setFocusedDay(DateTime.parse(result.notification.payload.collapseId));
-        _selectedDay = _calendarController.selectedDay;
-        if (result.notification.payload.additionalData['time'] != null) {
-          time = int.parse(result.notification.payload.additionalData['time']);
-        }else{
-          return;
-        }
-        if(result.notification.payload.additionalData['id'] !=null){
-          messageId = result.notification.payload.additionalData['id'];
-          youGotMessage = true;
-        }
-        if(result.notification.payload.additionalData['name'] !=null){
-          collName = result.notification.payload.additionalData['name'];
-        }
-      });
-
-    });
     checkDoc();
 
     _selectedDay = DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day, );
@@ -160,17 +113,19 @@ class _HomeState extends State<Home> {
       builder: (context, snapshot) {
         if(!snapshot.hasData){return Indicator();}
 
-
         final events = snapshot.data.where((element) => element.participants.any((element) => element['id'] == Auth().currentUser.uid)).toList();
         _groupEvents(events);
 
         return Scaffold(
               appBar: AppBar(
-                brightness: Brightness.light,
-                backgroundColor: Colors.white10,
+                brightness: Brightness.dark,
+                titleSpacing: 0,
+                leading: IconButton(icon: Icon(Icons.arrow_back),
+                onPressed: ()=> Navigator.pop(context),),
+                backgroundColor: Color.fromRGBO(77, 116, 99, 0.9),
                 actions: [
                 Padding(
-                  padding: const EdgeInsets.only(top:5.0),
+                  padding: const EdgeInsets.only(top:2.0),
                   child: LegendBar(),
                 ),
                   //SizedBox(width: 5,),
@@ -178,7 +133,7 @@ class _HomeState extends State<Home> {
                 ],
                 automaticallyImplyLeading: false,
                 elevation: 0,
-                title:   UserBar(color: Colors.black),
+                title: Text('My Calendar',style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
 
               ),
               floatingActionButton: (youGotMessage == true && messageId != null) ?
@@ -207,191 +162,164 @@ class _HomeState extends State<Home> {
                 }
               )
               :Container(),
-              body: WillPopScope(
-                onWillPop: _onPress,
-                child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TableCalendar(
-                          rowHeight: 55,
-                          calendarStyle: CalendarStyle(
-                            cellMargin: EdgeInsets.zero,
-                            weekdayStyle: TextStyle(fontSize: 15),
-                            weekendStyle: TextStyle(fontSize: 15, color: Colors.red),
-                            holidayStyle: TextStyle(fontSize: 15, color: Colors.red)
-                          ),
-                          events: _groupedEvents,
+              body: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TableCalendar(
+                        rowHeight: 55,
+                        calendarStyle: CalendarStyle(
+                          cellMargin: EdgeInsets.zero,
+                          weekdayStyle: TextStyle(fontSize: 15),
+                          weekendStyle: TextStyle(fontSize: 15, color: Colors.red),
+                          holidayStyle: TextStyle(fontSize: 15, color: Colors.red)
+                        ),
+                        events: _groupedEvents,
 
-                          headerStyle: HeaderStyle(
-                            titleTextStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
-                            leftChevronIcon: Icon(Icons.chevron_left, color: Colors.black87,),
-                            rightChevronIcon: Icon(Icons.chevron_right, color: Colors.black87,),
-                              formatButtonShowsNext: false,
-                            formatButtonTextStyle: TextStyle(color: Colors.black87, fontSize: 13),
-                            formatButtonDecoration: BoxDecoration( color: Colors.white10,borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black87)),
-                            formatButtonPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 10),
-                              headerPadding: EdgeInsets.zero),
-                          calendarController: _calendarController,
-                        initialCalendarFormat: CalendarFormat.twoWeeks,
-                          weekendDays: [DateTime.sunday],
-                          onDaySelected: (DateTime day,_,__){
+                        headerStyle: HeaderStyle(
+                          titleTextStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
+                          leftChevronIcon: Icon(Icons.chevron_left, color: Colors.black87,),
+                          rightChevronIcon: Icon(Icons.chevron_right, color: Colors.black87,),
+                            formatButtonShowsNext: false,
+                          formatButtonTextStyle: TextStyle(color: Colors.black87, fontSize: 13),
+                          formatButtonDecoration: BoxDecoration( color: Colors.white10,borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black87)),
+                          formatButtonPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+                            headerPadding: EdgeInsets.zero),
+                        calendarController: _calendarController,
+                      initialCalendarFormat: CalendarFormat.twoWeeks,
+                        weekendDays: [DateTime.sunday],
+                        onDaySelected: (DateTime day,_,__){
 
-                            var list = snapshot.data.where((element) => DateTime.parse(element.date).isAtSameMomentAs( DateTime(day.year, day.month, day.day)) && element.participants.any((element) => element['id'] == Auth().currentUser.uid)).map((e) => e.startHour).toList();
-                            list.sort();
-                            bookTimeOT.clear();
-                            setState(() {
-                              _calendarController.setSelectedDay(day);
-                              _selectedDay =  DateTime(day.year, day.month, day.day);
-                              if(list.isNotEmpty){
-                                time = list[0];
-                              }else{
-                                time = 6;}
-                              //time = 6;
-                            });
+                          var list = snapshot.data.where((element) => DateTime.parse(element.date).isAtSameMomentAs( DateTime(day.year, day.month, day.day)) && element.participants.any((element) => element['id'] == Auth().currentUser.uid)).map((e) => e.startHour).toList();
+                          list.sort();
+                          bookTimeOT.clear();
+                          setState(() {
+                            _calendarController.setSelectedDay(day);
+                            _selectedDay =  DateTime(day.year, day.month, day.day);
+                            if(list.isNotEmpty){
+                              time = list[0];
+                            }else{
+                              time = 6;}
+                            //time = 6;
+                          });
+                        },
+
+                        initialSelectedDay: DateTime.now(),
+                        builders: CalendarBuilders(
+                          selectedDayBuilder: (context, date, events) => Container(
+                              margin: const EdgeInsets.all(8.0),
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                  color: Colors.teal.shade400,
+                                  borderRadius: BorderRadius.circular(10)),
+                              child: Text(
+                                date.day.toString(),
+                                style: TextStyle(color: Colors.white,),
+                              )),
+                          todayDayBuilder: (context, date, events) => Container(
+                              margin: const EdgeInsets.all(8.0),
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                  color: Colors.teal.shade100.withOpacity(0.4),
+                                  borderRadius: BorderRadius.circular(10),
+                              border: Border.all()),
+                              child: Text(
+                                date.day.toString(),
+                                style: TextStyle(color: Colors.green.shade800, fontWeight: FontWeight.w600),
+                              )),
+                          markersBuilder: (_, date, _groupedEvents , __) {
+                            return [
+                              Positioned(
+                                top: -1,
+                                right: 0,
+                                child: Container(
+                                    constraints: BoxConstraints(
+                                      minWidth: 14,
+                                      minHeight: 14,),
+                                    padding: EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                     // borderRadius: BorderRadius.circular(7),
+                                  color: Colors.deepOrangeAccent),
+
+                                    child: Text('${_groupedEvents.length}', style: TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w600), textAlign: TextAlign.center,)),
+                              )
+                            ] ;
                           },
-
-                          initialSelectedDay: DateTime.now(),
-                          builders: CalendarBuilders(
-                            selectedDayBuilder: (context, date, events) => Container(
-                                margin: const EdgeInsets.all(8.0),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                    color: Colors.teal.shade400,
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: Text(
-                                  date.day.toString(),
-                                  style: TextStyle(color: Colors.white,),
-                                )),
-                            todayDayBuilder: (context, date, events) => Container(
-                                margin: const EdgeInsets.all(8.0),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                    color: Colors.teal.shade100.withOpacity(0.4),
-                                    borderRadius: BorderRadius.circular(10),
-                                border: Border.all()),
-                                child: Text(
-                                  date.day.toString(),
-                                  style: TextStyle(color: Colors.green.shade800, fontWeight: FontWeight.w600),
-                                )),
-                            markersBuilder: (_, date, _groupedEvents , __) {
-                              return [
-                                Positioned(
-                                  top: -1,
-                                  right: 0,
-                                  child: Container(
-                                      constraints: BoxConstraints(
-                                        minWidth: 14,
-                                        minHeight: 14,),
-                                      padding: EdgeInsets.all(4),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                       // borderRadius: BorderRadius.circular(7),
-                                    color: Colors.deepOrangeAccent),
-
-                                      child: Text('${_groupedEvents.length}', style: TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w600), textAlign: TextAlign.center,)),
-                                )
-                              ] ;
-                            },
-                          ),
                         ),
-                        SizedBox(height: 2,),
-                        Container(
-                          child: Center(
-                            child: AdmobBanner(
-                                adUnitId: ads.getBannerAdId(),
-                                adSize: AdmobBannerSize.BANNER),
-                          ),
+                      ),
+                      SizedBox(height: 2,),
+                      Container(
+                        child: Center(
+                          child: AdmobBanner(
+                              adUnitId: ads.getBannerAdId(),
+                              adSize: AdmobBannerSize.BANNER),
                         ),
-                        SizedBox(height: 5,),
-                        //AD was Here
+                      ),
+                      SizedBox(height: 5,),
+                      //AD was Here
 
-                        Expanded(
-                          child: Stack(
-                            children: [
-                              buildDayView( snapshot, context,
-                                now, Colors.teal.shade200.withOpacity(0.4), Colors.teal.shade200.withOpacity(0.6), Colors.black54, 60),
-                              collName != null ? Positioned(
-                                bottom: 20,
-                                right: 20,
-
-
-                                child: StreamBuilder<List<RegUser>>(
-                                  stream: person.users,
-                                  builder: (context, snp) {
-                                    if(snp.hasData){
-                                      var sender = snp.data.where((element) => element.uid == collName).first;
-
-                                      return Container(
-                                          width: 250,
-                                          child:Column(
-                                              children:[Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                                                child: person.colleagues.map((e) => e['collId']).toList().contains(collName) ?
-                                                Text('${sender.displayName} added you as colleague', style: TextStyle(color: Colors.white), overflow: TextOverflow.clip,maxLines: 2,):
-                                                Text('Request from ${sender.displayName} to be your colleague' , style: TextStyle(color: Colors.white), overflow: TextOverflow.clip,maxLines: 2,),
-                                              ),
-                                                TextButton(
-                                                  child: Text('OK', style: TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.w600)),
-                                                  onPressed: ()async{
+                      Expanded(
+                        child: Stack(
+                          children: [
+                            buildDayView( snapshot, context,
+                              now, Colors.teal.shade200.withOpacity(0.4), Colors.teal.shade200.withOpacity(0.6), Colors.black54, 60),
+                            collName != null ? Positioned(
+                              bottom: 20,
+                              right: 20,
 
 
-                                                    await Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-                                                        ProfilePage(3, collName, _status))).then((value){
-                                                      setState(() {
-                                                        collName = null;
-                                                      });
+                              child: StreamBuilder<List<RegUser>>(
+                                stream: person.users,
+                                builder: (context, snp) {
+                                  if(snp.hasData){
+                                    var sender = snp.data.where((element) => element.uid == collName).first;
+
+                                    return Container(
+                                        width: 250,
+                                        child:Column(
+                                            children:[Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                                              child: person.colleagues.map((e) => e['collId']).toList().contains(collName) ?
+                                              Text('${sender.displayName} added you as colleague', style: TextStyle(color: Colors.white), overflow: TextOverflow.clip,maxLines: 2,):
+                                              Text('Request from ${sender.displayName} to be your colleague' , style: TextStyle(color: Colors.white), overflow: TextOverflow.clip,maxLines: 2,),
+                                            ),
+                                              TextButton(
+                                                child: Text('OK', style: TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.w600)),
+                                                onPressed: ()async{
+
+
+                                                  await Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
+                                                      ProfilePage(3, collName, _status))).then((value){
+                                                    setState(() {
+                                                      collName = null;
                                                     });
-                                                    }
-                                                )
-                                              ]
-                                          ),
-                                          decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(10),
-                                              color: Colors.indigo.shade300.withOpacity(0.8))
-                                      );
-                                    }
-                                   return Indicator();
-
+                                                  });
+                                                  }
+                                              )
+                                            ]
+                                        ),
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(10),
+                                            color: Colors.indigo.shade300.withOpacity(0.8))
+                                    );
                                   }
-                                ),
+                                 return Indicator();
 
-                                ) : Container(),]
-                          ),
+                                }
+                              ),
+
+                              ) : Container(),]
                         ),
-                        //SizedBox(height: 10,),
+                      ),
+                      //SizedBox(height: 10,),
 
-                      ],
-                ),
+                    ],
               ),
             );
           }
 
 
     );
-  }
-
-  Future<bool> _onPress(){
-    return showDialog(context: context,
-        builder: (context){
-          return AlertDialog(
-            title: Text('Exit'),
-            content: Text('Exit Application?'),
-            actions: [
-              TextButton(
-                  onPressed: (){
-                    Navigator.of(context).pop(false);
-                  },
-                  child: Text('Cancel')),
-              TextButton(
-                  onPressed: () async {
-                    final auth = Provider.of<AuthBase>(context, listen: false);
-                    await auth.signOut();
-                    Navigator.of(context).pop(true);
-                  },
-                  child: Text('Exit'))
-            ],
-          );
-        });
   }
 
 
@@ -434,7 +362,7 @@ class _HomeState extends State<Home> {
 
         dayBarStyleBuilder: (tgl) => DayBarStyle(
           decoration: BoxDecoration(border: Border.symmetric(vertical: BorderSide(color: Colors.grey.shade400.withOpacity(0.8), width: 0.5), horizontal: BorderSide.none),color:  Colors.grey.shade200.withOpacity(0.9),),
-          textStyle: TextStyle(fontWeight: tgl == _selectedDay ? FontWeight.w600 : null, color: tgl == _selectedDay ? Colors.teal.shade800 : null, fontSize: tgl == today ? 16: 12),
+          textStyle: TextStyle(fontWeight: tgl == _selectedDay ? FontWeight.w600 : null, color: tgl == _selectedDay ? Colors.teal.shade800 : null, fontSize: tgl == today ? 15: 12),
 
             textAlignment: tgl != _selectedDay? Alignment.centerLeft : Alignment.center,
             dateFormatter: tgl != today ? (day, month,year) {return formatDate(tgl, ['dd','  ', 'M','  ', 'yyyy']);}

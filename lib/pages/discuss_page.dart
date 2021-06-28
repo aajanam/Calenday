@@ -74,6 +74,7 @@ class _DiscussPageState extends State<DiscussPage> {
     return Scaffold(
 
       appBar: AppBar(
+        backgroundColor: Color.fromRGBO(77, 116, 99, 0.9),
         leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: (){
           Navigator.pop(context, {'messageId':null, 'youGotMesssage':false});
         },),
