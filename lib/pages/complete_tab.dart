@@ -59,7 +59,7 @@ class CompleteTab extends StatelessWidget {
                                 )),
                               child: Container(
                                   decoration: BoxDecoration(
-                                      border: Border(left: BorderSide(width: 13, color: Colors.brown.shade300))),
+                                      border: Border(left: BorderSide(width: 13, color: Color.fromRGBO(200, 210, 228, 0.5)))),
                                 child: Column(
                                     children: [
                                       Padding(
@@ -72,7 +72,7 @@ class CompleteTab extends StatelessWidget {
                                             Expanded(
                                               flex: 8,
                                               child: Text( 'Done on:  ' + formatDate(DateTime.parse(snapshot.data[index].created.toDate().toIso8601String()),[d,' ',M,' ',yyyy,' - ',HH,':',nn]), style:
-                                              TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black54))),
+                                              TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color.fromRGBO(200, 210, 228, 0.7)))),
                                           ],
                                         ),
                                       ),
@@ -82,13 +82,13 @@ class CompleteTab extends StatelessWidget {
                                         margin: EdgeInsets.zero,
 
                                         //padding: EdgeInsets.zero,
-                                        title: Text(snapshot.data[index].procedure, style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600, color: Colors.black54),overflow: TextOverflow.ellipsis),
+                                        title: Text(snapshot.data[index].procedure, style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600, color: Color.fromRGBO(200, 210, 228, 0.7)),overflow: TextOverflow.ellipsis),
                                         subtitle: Transform.translate(
                                             offset: Offset(0,-5),
-                                            child: Text(snapshot.data[index].diagnose, style: TextStyle(fontSize: 13, color: Colors.black54),overflow: TextOverflow.ellipsis)),
+                                            child: Text(snapshot.data[index].diagnose, style: TextStyle(fontSize: 13, color: Color.fromRGBO(200, 210, 228, 0.7)),overflow: TextOverflow.ellipsis)),
                                         description: Transform.translate(
                                             offset: Offset(0,-8),
-                                            child: Text(snapshot.data[index].place, style: TextStyle(fontSize: 12, color: Colors.black54),overflow: TextOverflow.ellipsis)),
+                                            child: Text(snapshot.data[index].place, style: TextStyle(fontSize: 12, color: Color.fromRGBO(200, 210, 228, 0.7)),overflow: TextOverflow.ellipsis)),
                                         icon: IconButton(
                                           onPressed: () {
                                             Navigator.of(context).push(MaterialPageRoute(builder: (context) => EventForm(event: snapshot.data[index], date: date,)));
@@ -96,7 +96,7 @@ class CompleteTab extends StatelessWidget {
                                           },
                                           icon: Icon(
                                             Icons.keyboard_arrow_right,
-                                            color: Colors.indigo.shade400,
+                                            color: Color.fromRGBO(198, 198, 198, 1),
                                           ),
                                         ),
                                       ),

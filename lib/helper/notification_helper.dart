@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:jadwalku/pages/home.dart';
+import 'package:jadwalku/pages/navhome.dart';
+import 'package:path/path.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 
 class NotificationService extends ChangeNotifier {
+  final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
+
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
   FlutterLocalNotificationsPlugin();
 
@@ -24,9 +29,10 @@ class NotificationService extends ChangeNotifier {
         android: androidInitializationSettings,
         iOS: iosInitializationSettings);
 
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+    onSelectNotification: onSelectNotification);
   }
-  Future<void> showNotification(int id, String title, String body) async {
+  Future<void> showNotification(int id, String title, String body, String payload) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
     AndroidNotificationDetails(
         'id',
@@ -39,7 +45,7 @@ class NotificationService extends ChangeNotifier {
     const NotificationDetails platformChannelSpecifics =
     NotificationDetails(android: androidPlatformChannelSpecifics);
     await _flutterLocalNotificationsPlugin.show(
-        id, title, body , platformChannelSpecifics,);
+        id, title, body , platformChannelSpecifics, payload: '$title - $body');
   }
 
   Future<void> zonedScheduleNotification(int id, title, body, String date, int hours, int option) async {
@@ -55,7 +61,6 @@ class NotificationService extends ChangeNotifier {
                 'Calenday',
                 'welcome to calenday',
               largeIcon: DrawableResourceAndroidBitmap("ic_launcher_round"),
-
                 playSound: true,
                 priority: Priority.high,
                 )),
@@ -69,6 +74,12 @@ class NotificationService extends ChangeNotifier {
 
   Future cancelNotification(id) async {
     await _flutterLocalNotificationsPlugin.cancel(id);
+  }
+
+  Future onSelectNotification(String payload) {
+     return navigatorKey.currentState.push(MaterialPageRoute(
+         builder: (context)=> NavHome(payload: payload,)));
+
   }
 
   /*Future onDidReceiveLocalNotification(

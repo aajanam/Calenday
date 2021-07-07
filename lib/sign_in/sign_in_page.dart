@@ -6,12 +6,11 @@ import 'package:jadwalku/sign_in/sign_in_bloc.dart';
 import 'package:jadwalku/widget/social_sign_in_button.dart';
 import 'package:provider/provider.dart';
 
-
 class SignInPage extends StatelessWidget {
-  const SignInPage({Key key, @required this.bloc, @required this.isLoading}) : super(key: key);
+  const SignInPage({Key key, @required this.bloc, @required this.isLoading})
+      : super(key: key);
   final SignInBloc bloc;
   final bool isLoading;
-
 
   static Widget create(BuildContext context) {
     final auth = Provider.of<AuthBase>(context, listen: false);
@@ -21,7 +20,8 @@ class SignInPage extends StatelessWidget {
         builder: (_, isLoading, __) => Provider<SignInBloc>(
           create: (_) => SignInBloc(auth: auth, isLoading: isLoading),
           child: Consumer<SignInBloc>(
-            builder: (_, bloc, __) => SignInPage(bloc: bloc, isLoading: isLoading.value),
+            builder: (_, bloc, __) =>
+                SignInPage(bloc: bloc, isLoading: isLoading.value),
           ),
         ),
       ),
@@ -35,7 +35,6 @@ class SignInPage extends StatelessWidget {
     ).show(context);
   }
 
-
   Future<void> _signInWithGoogle(BuildContext context) async {
     try {
       await bloc.signInWithGoogle();
@@ -44,34 +43,32 @@ class SignInPage extends StatelessWidget {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:_buildContent(context),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        backgroundColor: Color.fromRGBO(48, 48, 48, 1),
+        brightness: Brightness.dark,
+      ),
+      body: _buildContent(context),
     );
   }
 
   Widget _buildContent(BuildContext context) {
-    return Container(decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [
-          Color.fromRGBO(77, 116, 99, 0.9),
-          Colors.cyan.shade100,
-        ],
-        begin: Alignment.bottomRight,
-        end: Alignment.topCenter
-      )
-    ),
+    return Container(
+      decoration: BoxDecoration(color: Color.fromRGBO(48, 48, 48, 1)),
       child: Padding(
         padding: EdgeInsets.all(40.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-
             Center(child: _buildHeader()),
-            SizedBox(height: 30,),
+            SizedBox(
+              height: 30,
+            ),
             SocialSignInButton(
               assetName: 'images/google-logo.png',
               text: 'Sign in with Google',
@@ -80,12 +77,16 @@ class SignInPage extends StatelessWidget {
               onPressed: isLoading ? null : () => _signInWithGoogle(context),
             ),
             SizedBox(height: 30.0),
-            (isLoading) ? Center(
-              child: LinearProgressIndicator(
-                color: Color.fromRGBO(240, 213, 176, 0.9),
-                backgroundColor: Color.fromRGBO(119, 92, 82, 0.9),),)
-                : Container(height: 8,),
-
+            (isLoading)
+                ? Center(
+                    child: LinearProgressIndicator(
+                      backgroundColor: Color.fromRGBO(198, 198, 198,1),
+                      color: Colors.blue,
+                    ),
+                  )
+                : Container(
+                    height: 8,
+                  ),
           ],
         ),
       ),
@@ -101,7 +102,7 @@ class SignInPage extends StatelessWidget {
           style: TextStyle(
             fontSize: 36.0,
             fontWeight: FontWeight.w600,
-            color: Color.fromRGBO(115, 92, 82, 1),
+            color: Color.fromRGBO(225, 225, 225, 1),
           ),
         ),
       ],

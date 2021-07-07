@@ -12,34 +12,31 @@ import 'package:provider/provider.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  OneSignal.shared.init(
-      "6bc984f5-33ee-469f-b1f4-10ce18d3116b",
-      iOSSettings: null
-  );
+  OneSignal.shared
+      .init("6bc984f5-33ee-469f-b1f4-10ce18d3116b", iOSSettings: null);
 
   await Firebase.initializeApp();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
   tz.initializeTimeZones();
   Admob.initialize();
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-            create: (context) => DiscussionProvider()),
-        ChangeNotifierProvider(
-            create: (context) => UserProvider()),
+        ChangeNotifierProvider(create: (context) => DiscussionProvider()),
+        ChangeNotifierProvider(create: (context) => UserProvider()),
         ChangeNotifierProvider(
           create: (context) => EventProvider(),
         ),
@@ -49,14 +46,15 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         debugShowCheckedModeBanner: false,
         title: 'Calgenda',
         theme: ThemeData(
-          iconTheme: IconThemeData(color: Colors.white),
-          fontFamily: 'OpenSans',
-          primaryColor: Colors.cyan.shade600,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
+            iconTheme: IconThemeData(color: Colors.white),
+            fontFamily: 'OpenSans',
+            primaryColor: Color.fromRGBO(48, 48, 48, 1),
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+            brightness: Brightness.dark),
         home: LandingPage(),
       ),
     );
