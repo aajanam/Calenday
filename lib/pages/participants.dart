@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:jadwalku/model/events.dart';
 import 'package:jadwalku/model/users.dart';
 import 'package:jadwalku/pages/colleague.dart';
-import 'package:jadwalku/pages/profile.dart';
 import 'package:jadwalku/provider/events_provider.dart';
 import 'package:jadwalku/provider/userProvider.dart';
 import 'package:jadwalku/services/auth.dart';
@@ -37,7 +36,6 @@ class Participants extends StatefulWidget {
 }
 
 class _ParticipantsState extends State<Participants> {
-  final _shareController = TextEditingController();
   String name = '';
   List groups = ['All'];
   String groupItem;
@@ -49,19 +47,23 @@ class _ParticipantsState extends State<Participants> {
   List colleagueIDList = [];
   List userWhoHaveMyId = [];
 
-  Future sendMessage(playerId, messageTitle, messageBody, collapseID) async {
+  Future sendMessage(playerId, messageTitle, messageBody, date, time) async {
     await OneSignal.shared.postNotification(OSCreateNotification(
         playerIds: [playerId],
         content: messageBody,
         heading: messageTitle,
-        collapseId: collapseID,
         sendAfter: DateTime.now().add(Duration(seconds: 30)).toUtc(),
+        additionalData: {'time': time, 'date':date},
         androidSmallIcon: 'ic_launcher',
         androidLargeIcon: 'ic_launcher_round'));
   }
 
+  TextEditingController _searchController = TextEditingController();
+
   @override
   void initState() {
+    _searchController.text = name;
+
     final person = Provider.of<UserProvider>(context, listen: false);
     final event = Provider.of<EventProvider>(context, listen: false);
     if (widget.regUser != null) {
@@ -77,6 +79,12 @@ class _ParticipantsState extends State<Participants> {
     }
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -122,6 +130,13 @@ class _ParticipantsState extends State<Participants> {
                         .contains(e['collId']))
                 .where((element) => element == true)
                 .length;
+            int remaining =
+                (widget?.participants?.length ?? 0) - person.colleagues.length;
+            bool show = widget.participants.length > 1 &&
+                event.procedure != null &&
+                event.diagnose != null;
+
+            print(remaining);
 
             return Scaffold(
               appBar: AppBar(
@@ -137,7 +152,12 @@ class _ParticipantsState extends State<Participants> {
                               ),
                               onPressed: () {
                                 Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => Colleague()));
+                                    builder: (context) => Colleague(
+                                          regUser: snapshot.data.singleWhere(
+                                              (element) =>
+                                                  element.uid ==
+                                                  Auth().currentUser.uid),
+                                        )));
                               },
                               label: Text(
                                 'Colleagues',
@@ -164,7 +184,8 @@ class _ParticipantsState extends State<Participants> {
                                   ' ',
                                   'yyyy'
                                 ])} : ${widget.procedure} at ${widget.place}',
-                            '${widget.date}');
+                            '${widget.date}',
+                            '${widget.event.startHour}');
                       }
                     }
 
@@ -199,7 +220,7 @@ class _ParticipantsState extends State<Participants> {
                                     enabled:
                                         widget.isDone == false ? true : false,
 
-                                    controller: _shareController,
+                                    controller: _searchController,
                                     textInputAction: TextInputAction.done,
                                     //focusNode: searchNode,
                                     decoration: InputDecoration(
@@ -376,15 +397,6 @@ class _ParticipantsState extends State<Participants> {
                                   color: Color.fromRGBO(38, 38, 38, 1),
                                   margin: EdgeInsets.only(bottom: 5),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
-                                  child: Text(
-                                    'Swipe to left to remove',
-                                    style: TextStyle(
-                                        color: Color.fromRGBO(163, 163, 163, 1),
-                                        fontSize: 13),
-                                  ),
-                                )
                               ],
                             ),
                           )
@@ -394,24 +406,38 @@ class _ParticipantsState extends State<Participants> {
                             padding: EdgeInsets.only(top: 10, bottom: 10),
                             shrinkWrap: true,
                             children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10, bottom: 8),
-                            child: Text(
-                              widget.participants.length > 1 &&
-                                      event.procedure != null &&
-                                      event.diagnose != null
-                                  ? 'Participants in ${event.procedure} - ${event.diagnose}:'
-                                  : 'Invite participants:',
-                              style: TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.w600),
-                            ),
-                          ),
+                          show
+                              ? Padding(
+                                  padding:
+                                      const EdgeInsets.only(top: 10, bottom: 3),
+                                  child: Text(
+                                    'Participants in ${event.procedure} - ${event.diagnose} :',
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                )
+                              : Container(),
+                          show
+                              ? Padding(
+                                  padding: const EdgeInsets.only(bottom: 8.0),
+                                  child: Text(
+                                    'Swipe to left to remove',
+                                    style: TextStyle(
+                                        color: Color.fromRGBO(163, 163, 163, 1),
+                                        fontSize: 13),
+                                  ),
+                                )
+                              : Container(),
+                          //if (name.isEmpty)
                           for (var e = 1; e < widget.participants.length; e++)
                             Dismissible(
                               direction: (widget.event != null &&
                                           widget.event.creatorId ==
                                               Auth().currentUser.uid) ||
-                                      widget.event == null ? DismissDirection.endToStart : DismissDirection.none,
+                                      widget.event == null
+                                  ? DismissDirection.endToStart
+                                  : DismissDirection.none,
                               background: Container(
                                 decoration: BoxDecoration(
                                     color: Colors.pinkAccent.withOpacity(0.1),
@@ -435,25 +461,24 @@ class _ParticipantsState extends State<Participants> {
                                 )),
                               ),
                               key: Key(widget.participants[e].toString()),
-                              onDismissed: 
-                                  (direction) async {
-                                      playIds.remove(snapshot.data
-                                          .where((element) =>
-                                              element.uid ==
-                                              widget.participants[e]['id'])
-                                          .first
-                                          .deviceToken);
+                              onDismissed: (direction) async {
+                                playIds.remove(snapshot.data
+                                    .where((element) =>
+                                        element.uid ==
+                                        widget.participants[e]['id'])
+                                    .first
+                                    .deviceToken);
 
-                                      setState(() {
-                                        widget.participants
-                                            .remove(widget.participants[e]);
-                                        event.changeParticipants =
-                                            widget.participants;
-                                      });
-                                      if (widget.event != null) {
-                                        event.saveEvent();
-                                      }
-                                    },
+                                setState(() {
+                                  widget.participants
+                                      .remove(widget.participants[e]);
+                                  event.changeParticipants =
+                                      widget.participants;
+                                });
+                                if (widget.event != null) {
+                                  event.saveEvent();
+                                }
+                              },
                               child: ListTile(
                                 contentPadding:
                                     EdgeInsets.symmetric(horizontal: 8),
@@ -477,7 +502,7 @@ class _ParticipantsState extends State<Participants> {
                                       fontWeight: FontWeight.w600),
                                 ),
                                 subtitle: Transform.translate(
-                                  offset: Offset(0, -5),
+                                  offset: Offset(0, -2),
                                   child: Text(
                                       snapshot.data
                                                   .where((element) =>
@@ -512,6 +537,16 @@ class _ParticipantsState extends State<Participants> {
                                     : null,
                               ),
                             ),
+                          !show || remaining < 1
+                              ? Padding(
+                                  padding:
+                                      const EdgeInsets.only(top: 10, bottom: 8),
+                                  child: Text('Invite Participants :',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600)),
+                                )
+                              : Container(),
                           if (widget?.event?.creatorId ==
                                       Auth().currentUser.uid &&
                                   person.colleagues.length == 0 ||
@@ -589,7 +624,7 @@ class _ParticipantsState extends State<Participants> {
                                         style: TextStyle(fontSize: 14),
                                       ),
                                       subtitle: Transform.translate(
-                                          offset: Offset(0, -5),
+                                          offset: Offset(0, -2),
                                           child: Text(
                                             snapshot.data
                                                 .where((element) =>
@@ -634,7 +669,6 @@ class _ParticipantsState extends State<Participants> {
 
                                             if (widget.event != null) {
                                               event.saveEvent();
-                                              print(playIds);
                                             }
                                           },
                                           child: Chip(
@@ -667,7 +701,7 @@ class _ParticipantsState extends State<Participants> {
                                               element.uid == item['collId'])
                                           .first
                                           .nameSearch
-                                          .contains(name)
+                                          .contains(name.toLowerCase())
                                   ? ListTile(
                                       contentPadding:
                                           EdgeInsets.symmetric(horizontal: 8),
@@ -687,7 +721,7 @@ class _ParticipantsState extends State<Participants> {
                                               .displayName,
                                           style: TextStyle(fontSize: 14)),
                                       subtitle: Transform.translate(
-                                          offset: Offset(0, -5),
+                                          offset: Offset(0, -2),
                                           child: Text(
                                               snapshot.data
                                                   .where((element) =>
@@ -698,6 +732,7 @@ class _ParticipantsState extends State<Participants> {
                                               style: TextStyle(fontSize: 13))),
                                       trailing: GestureDetector(
                                           onTap: () {
+                                            _searchController.clear();
                                             setState(() {
                                               var val = {
                                                 'id': snapshot.data
@@ -713,6 +748,7 @@ class _ParticipantsState extends State<Participants> {
                                               event.changeParticipants =
                                                   widget.participants;
                                             });
+                                            name = '';
                                             if (snapshot.data
                                                     .where((element) =>
                                                         element.uid ==

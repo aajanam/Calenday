@@ -11,14 +11,16 @@ import 'package:provider/provider.dart';
 class Colleague extends StatefulWidget {
   final RegUser regUser;
   final String iD;
+  final String reqName;
 
-  Colleague({this.regUser, this.iD});
+  Colleague({this.regUser, this.iD, this.reqName});
 
   @override
   _ColleagueState createState() => _ColleagueState();
 }
 
 class _ColleagueState extends State<Colleague> {
+  TextEditingController _searchController = TextEditingController();
   String name = '';
   String groupItem;
   List colleagues = [];
@@ -31,6 +33,10 @@ class _ColleagueState extends State<Colleague> {
 
   @override
   void initState() {
+    if (widget.reqName != null) {
+      name = widget.reqName;
+    }
+    _searchController.text = name;
     final person = Provider.of<UserProvider>(context, listen: false);
     if (widget.regUser != null) {
       person.loadAll(widget.regUser);
@@ -39,6 +45,12 @@ class _ColleagueState extends State<Colleague> {
     }
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future sendMessage(playerId, messageTitle, messageBody, id) async {
@@ -98,6 +110,7 @@ class _ColleagueState extends State<Colleague> {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 0.0, top: 10),
                       child: TextFormField(
+                        controller: _searchController,
                         cursorColor: Colors.white,
                         style: TextStyle(fontSize: 15),
                         textInputAction: TextInputAction.done,
@@ -344,9 +357,11 @@ class _ColleagueState extends State<Colleague> {
                                 .length >
                             0
                         ? Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
+                            padding: const EdgeInsets.only(top: 12.0),
                             child: Text(
-                              'Swipe to left to remove',
+                              (name.isEmpty)
+                                  ? 'Swipe to left to remove'
+                                  : 'Search result : ',
                               style: TextStyle(
                                   color: Color.fromRGBO(160, 160, 160, 1),
                                   fontSize: 13),
@@ -362,7 +377,8 @@ class _ColleagueState extends State<Colleague> {
                               !person.colleagues
                                       .map((e) => e['collId'])
                                       .contains(element.uid) &&
-                                  element.nameSearch.contains(name) &&
+                                  element.nameSearch
+                                      .contains(name.toLowerCase()) &&
                                   element.uid != Auth().currentUser.uid ||
                               element.uid == widget.iD &&
                                   !person.colleagues
@@ -379,7 +395,7 @@ class _ColleagueState extends State<Colleague> {
                                   style: TextStyle(fontSize: 14),
                                 ),
                                 subtitle: Transform.translate(
-                                    offset: Offset(0, -5),
+                                    offset: Offset(0, -2),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       crossAxisAlignment:
@@ -391,12 +407,15 @@ class _ColleagueState extends State<Colleague> {
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 1,
                                         ),
-                                        Transform.translate(
-                                            offset: Offset(0, -5),
-                                            child: Text(
-                                              i?.specialty ?? '',
-                                              style: TextStyle(fontSize: 13),
-                                            )),
+                                        i.specialty != null
+                                            ? Transform.translate(
+                                                offset: Offset(0, -2),
+                                                child: Text(
+                                                  i?.specialty ?? '',
+                                                  style:
+                                                      TextStyle(fontSize: 13),
+                                                ))
+                                            : Container(),
                                       ],
                                     )),
                                 trailing: GestureDetector(
@@ -412,11 +431,13 @@ class _ColleagueState extends State<Colleague> {
                                         EdgeInsets.symmetric(horizontal: 6),
                                   ),
                                   onTap: () {
-                                    sendMessage(
-                                        i.deviceToken,
-                                        'Colleague request',
-                                        'from ${person.displayName}',
-                                        '${person.uid}');
+                                    if (widget.reqName == null) {
+                                      sendMessage(
+                                          i.deviceToken,
+                                          'Colleague request',
+                                          'from ${person.displayName}',
+                                          '${person.uid}');
+                                    }
 
                                     setState(() {
                                       var val = {
@@ -424,244 +445,246 @@ class _ColleagueState extends State<Colleague> {
                                         'group': ['All'],
                                       };
                                       person.colleagues.add(val);
+                                      name = '';
                                     });
 
                                     if (widget.regUser != null) {
                                       person.setUser();
                                     }
+                                    _searchController.clear();
                                   },
                                 )),
-                          for (var item in colleagueIDList)
-                            item['group'].contains(highlight)
-                                ? Dismissible(
-                                    direction: DismissDirection.endToStart,
-                                    background: Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.pinkAccent
-                                              .withOpacity(0.1),
-                                          border: Border(
-                                            right: BorderSide(
-                                                color: Colors.black, width: 2),
-                                            top: BorderSide(
-                                                color: Colors.black,
-                                                width: 1.5),
-                                            bottom: BorderSide(
-                                                color: Colors.black,
-                                                width: 0.2),
-                                            left: BorderSide(
-                                                color: Colors.black,
-                                                width: 0.2),
-                                          )),
-                                      child: Center(
-                                          child: Text(
-                                        'Remove from colleague list',
-                                        style: TextStyle(
-                                            color: Colors.pink.shade100,
-                                            fontStyle: FontStyle.italic),
-                                        textAlign: TextAlign.center,
-                                      )),
-                                    ),
-                                    key: Key(item.toString()),
-                                    confirmDismiss: (d) => showDialog(
-                                        context: context,
-                                        builder: (context) => AlertDialog(
-                                              title: Text(
-                                                'Remove Colleague?',
-                                                style: TextStyle(
-                                                    fontSize: 17,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                              shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              15.0))),
-                                              actions: [
-                                                TextButton(
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        person.colleagues
-                                                            .remove(item);
-                                                      });
-                                                      if (widget.regUser !=
-                                                          null) {
-                                                        person.setUser();
-                                                      }
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: Text("Remove",
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            color: Colors.pink
-                                                                .shade300)))
-                                              ],
+                          if (name.isEmpty)
+                            for (var item in colleagueIDList)
+                              item['group'].contains(highlight)
+                                  ? Dismissible(
+                                      direction: DismissDirection.endToStart,
+                                      background: Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.pinkAccent
+                                                .withOpacity(0.1),
+                                            border: Border(
+                                              right: BorderSide(
+                                                  color: Colors.black,
+                                                  width: 2),
+                                              top: BorderSide(
+                                                  color: Colors.black,
+                                                  width: 1.5),
+                                              bottom: BorderSide(
+                                                  color: Colors.black,
+                                                  width: 0.2),
+                                              left: BorderSide(
+                                                  color: Colors.black,
+                                                  width: 0.2),
                                             )),
-                                    child: ListTile(
-                                      contentPadding:
-                                          EdgeInsets.symmetric(horizontal: 5),
-                                      leading: CircleAvatar(
-                                        backgroundColor:
-                                            Color.fromRGBO(100, 100, 100, 1),
-                                        backgroundImage: userWhoHaveMyId
-                                                .contains(item['collId'])
-                                            ? NetworkImage(snapshot.data
-                                                .where((element) =>
-                                                    element.uid ==
-                                                    item['collId'])
-                                                .first
-                                                .photoUrl)
-                                            : null,
+                                        child: Center(
+                                            child: Text(
+                                          'Remove from colleague list',
+                                          style: TextStyle(
+                                              color: Colors.pink.shade100,
+                                              fontStyle: FontStyle.italic),
+                                          textAlign: TextAlign.center,
+                                        )),
                                       ),
-                                      title: Text(
-                                        snapshot.data
-                                            .where((element) =>
-                                                element.uid == item['collId'])
-                                            .first
-                                            .displayName,
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: userWhoHaveMyId
-                                                    .contains(item['collId'])
-                                                ? FontWeight.w600
-                                                : null,
-                                            fontStyle: userWhoHaveMyId
-                                                    .contains(item['collId'])
-                                                ? FontStyle.normal
-                                                : FontStyle.italic),
-                                      ),
-                                      subtitle: Transform.translate(
-                                        offset: Offset(0, -5),
-                                        child: Text(
-                                          snapshot.data
-                                                      .where((element) =>
-                                                          element.uid ==
-                                                          item['collId'])
-                                                      .first
-                                                      .specialty !=
-                                                  null
-                                              ? snapshot.data
+                                      key: Key(item.toString()),
+                                      confirmDismiss: (d) => showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                                title: Text(
+                                                  'Remove Colleague?',
+                                                  style: TextStyle(
+                                                      fontSize: 17,
+                                                      fontWeight:
+                                                          FontWeight.w600),
+                                                ),
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                15.0))),
+                                                actions: [
+                                                  TextButton(
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          person.colleagues
+                                                              .remove(item);
+                                                        });
+                                                        if (widget.regUser !=
+                                                            null) {
+                                                          person.setUser();
+                                                        }
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text("Remove",
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              color: Colors.pink
+                                                                  .shade300)))
+                                                ],
+                                              )),
+                                      child: ListTile(
+                                        contentPadding:
+                                            EdgeInsets.symmetric(horizontal: 5),
+                                        leading: CircleAvatar(
+                                          backgroundColor:
+                                              Color.fromRGBO(100, 100, 100, 1),
+                                          backgroundImage: userWhoHaveMyId
+                                                  .contains(item['collId'])
+                                              ? NetworkImage(snapshot.data
                                                   .where((element) =>
                                                       element.uid ==
                                                       item['collId'])
                                                   .first
-                                                  .specialty
-                                              : '',
+                                                  .photoUrl)
+                                              : null,
+                                        ),
+                                        title: Text(
+                                          snapshot.data
+                                              .where((element) =>
+                                                  element.uid == item['collId'])
+                                              .first
+                                              .displayName,
                                           style: TextStyle(
-                                              fontSize: 13,
+                                              fontSize: 14,
+                                              fontWeight: userWhoHaveMyId
+                                                      .contains(item['collId'])
+                                                  ? FontWeight.w600
+                                                  : null,
                                               fontStyle: userWhoHaveMyId
                                                       .contains(item['collId'])
                                                   ? FontStyle.normal
                                                   : FontStyle.italic),
                                         ),
+                                        subtitle: Transform.translate(
+                                          offset: Offset(0, -2),
+                                          child: Text(
+                                            snapshot.data
+                                                        .where((element) =>
+                                                            element.uid ==
+                                                            item['collId'])
+                                                        .first
+                                                        .specialty !=
+                                                    null
+                                                ? snapshot.data
+                                                    .where((element) =>
+                                                        element.uid ==
+                                                        item['collId'])
+                                                    .first
+                                                    .specialty
+                                                : '',
+                                            style: TextStyle(
+                                                fontSize: 13,
+                                                fontStyle:
+                                                    userWhoHaveMyId.contains(
+                                                            item['collId'])
+                                                        ? FontStyle.normal
+                                                        : FontStyle.italic),
+                                          ),
+                                        ),
+                                        trailing:
+                                            userWhoHaveMyId
+                                                    .contains(item['collId'])
+                                                ? IconButton(
+                                                    icon: Icon(
+                                                        Icons.group_rounded),
+                                                    //color: Colors.teal,
+                                                    onPressed: () {
+                                                      showModalBottomSheet(
+                                                          context: context,
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius.vertical(
+                                                                      top: Radius
+                                                                          .circular(
+                                                                              10.0))),
+                                                          builder:
+                                                              (context) =>
+                                                                  ListView(
+                                                                    padding: EdgeInsets.symmetric(
+                                                                        horizontal:
+                                                                            15,
+                                                                        vertical:
+                                                                            15),
+                                                                    shrinkWrap:
+                                                                        true,
+                                                                    children: [
+                                                                      Padding(
+                                                                        padding: const EdgeInsets.only(
+                                                                            bottom:
+                                                                                10,
+                                                                            left:
+                                                                                15),
+                                                                        child: Text(
+                                                                            'Add to / Remove from Group(s) '),
+                                                                      ),
+                                                                      for (var i
+                                                                          in person
+                                                                              .groups)
+                                                                        StatefulBuilder(builder:
+                                                                            (context,
+                                                                                setModalState) {
+                                                                          if (item['group']
+                                                                              .contains(i)) {
+                                                                            setModalState(() {
+                                                                              isInGroup = true;
+                                                                            });
+                                                                          } else {
+                                                                            setModalState(() {
+                                                                              isInGroup = false;
+                                                                            });
+                                                                          }
+                                                                          return SingleChildScrollView(
+                                                                            child: i != 'All'
+                                                                                ? Row(
+                                                                                    //contentPadding: EdgeInsets.symmetric(horizontal: 30),
+                                                                                    children: [
+                                                                                        IconButton(
+                                                                                            icon: isInGroup == true
+                                                                                                ? Icon(
+                                                                                                    Icons.check_box,
+                                                                                                    color: Colors.blue,
+                                                                                                  )
+                                                                                                : Icon(
+                                                                                                    Icons.check_box_outline_blank,
+                                                                                                    color: Colors.grey,
+                                                                                                  ),
+                                                                                            onPressed: () {
+                                                                                              if (!item['group'].contains(i)) {
+                                                                                                item['group'].add(i);
+                                                                                                person.setUser();
+                                                                                                setModalState(() {
+                                                                                                  isInGroup = true;
+                                                                                                });
+                                                                                              } else if (item['group'].contains(i)) {
+                                                                                                item['group'].remove(i);
+                                                                                                person.setUser();
+                                                                                                setModalState(() {
+                                                                                                  isInGroup = false;
+                                                                                                });
+                                                                                              }
+                                                                                            }),
+                                                                                        Text(
+                                                                                          i,
+                                                                                          style: TextStyle(fontSize: 14),
+                                                                                        ),
+                                                                                      ])
+                                                                                : Container(),
+                                                                          );
+                                                                        })
+                                                                    ],
+                                                                  ));
+                                                    })
+                                                : Text('await...',
+                                                    style: TextStyle(
+                                                      fontStyle:
+                                                          FontStyle.italic,
+                                                      color: Colors.yellow,
+                                                    )),
                                       ),
-                                      trailing:
-                                          userWhoHaveMyId
-                                                  .contains(item['collId'])
-                                              ? IconButton(
-                                                  icon:
-                                                      Icon(Icons.group_rounded),
-                                                  //color: Colors.teal,
-                                                  onPressed: () {
-                                                    showModalBottomSheet(
-                                                        context: context,
-                                                        shape: RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius.vertical(
-                                                                    top: Radius
-                                                                        .circular(
-                                                                            10.0))),
-                                                        builder:
-                                                            (context) =>
-                                                                ListView(
-                                                                  padding: EdgeInsets.symmetric(
-                                                                      horizontal:
-                                                                          15,
-                                                                      vertical:
-                                                                          15),
-                                                                  shrinkWrap:
-                                                                      true,
-                                                                  children: [
-                                                                    Padding(
-                                                                      padding: const EdgeInsets
-                                                                              .only(
-                                                                          bottom:
-                                                                              10,
-                                                                          left:
-                                                                              15),
-                                                                      child: Text(
-                                                                          'Add to / Remove from Group(s) '),
-                                                                    ),
-                                                                    for (var i
-                                                                        in person
-                                                                            .groups)
-                                                                      StatefulBuilder(builder:
-                                                                          (context,
-                                                                              setModalState) {
-                                                                        if (item['group']
-                                                                            .contains(i)) {
-                                                                          setModalState(
-                                                                              () {
-                                                                            isInGroup =
-                                                                                true;
-                                                                          });
-                                                                        } else {
-                                                                          setModalState(
-                                                                              () {
-                                                                            isInGroup =
-                                                                                false;
-                                                                          });
-                                                                        }
-                                                                        return SingleChildScrollView(
-                                                                          child: i != 'All'
-                                                                              ? Row(
-                                                                                  //contentPadding: EdgeInsets.symmetric(horizontal: 30),
-                                                                                  children: [
-                                                                                      IconButton(
-                                                                                          icon: isInGroup == true
-                                                                                              ? Icon(
-                                                                                                  Icons.check_box,
-                                                                                                  color: Colors.blue,
-                                                                                                )
-                                                                                              : Icon(
-                                                                                                  Icons.check_box_outline_blank,
-                                                                                                  color: Colors.grey,
-                                                                                                ),
-                                                                                          onPressed: () {
-                                                                                            if (!item['group'].contains(i)) {
-                                                                                              item['group'].add(i);
-                                                                                              person.setUser();
-                                                                                              setModalState(() {
-                                                                                                isInGroup = true;
-                                                                                              });
-                                                                                            } else if (item['group'].contains(i)) {
-                                                                                              item['group'].remove(i);
-                                                                                              person.setUser();
-                                                                                              setModalState(() {
-                                                                                                isInGroup = false;
-                                                                                              });
-                                                                                            }
-                                                                                          }),
-                                                                                      Text(
-                                                                                        i,
-                                                                                        style: TextStyle(fontSize: 14),
-                                                                                      ),
-                                                                                    ])
-                                                                              : Container(),
-                                                                        );
-                                                                      })
-                                                                  ],
-                                                                ));
-                                                  })
-                                              : Text('await...',
-                                                  style: TextStyle(
-                                                    fontStyle: FontStyle.italic,
-                                                    color: Colors.yellow,
-                                                  )),
-                                    ),
-                                  )
-                                : Container(),
+                                    )
+                                  : Container(),
                         ],
                       ),
                     ),

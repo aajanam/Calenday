@@ -1,3 +1,4 @@
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:jadwalku/model/events.dart';
@@ -9,6 +10,8 @@ import 'package:jadwalku/provider/userProvider.dart';
 import 'package:jadwalku/services/auth.dart';
 import 'package:jadwalku/widget/progress_indicator.dart';
 import 'package:provider/provider.dart';
+import 'package:jadwalku/services/admob.dart';
+import 'package:admob_flutter/admob_flutter.dart';
 
 class ProfilePage extends StatefulWidget {
   final selectedPage;
@@ -22,6 +25,8 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   int currentPage;
+
+  final ads = AdMobService();
 
   @override
   void initState() {
@@ -61,7 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w600)),
                       bottom: PreferredSize(
-                        preferredSize: Size.fromHeight(80),
+                        preferredSize: Size.fromHeight(120),
                         child: Container(
                           decoration: BoxDecoration(
                             color: Color.fromRGBO(48, 48, 48, 1),
@@ -70,6 +75,14 @@ class _ProfilePageState extends State<ProfilePage> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              Center(
+                                child: AdmobBanner(
+                                    adUnitId: ads.getBannerAdId(),
+                                    adSize: AdmobBannerSize.BANNER),
+                              ),
+                              SizedBox(
+                                height: 15,
+                              ),
                               StreamBuilder<List<Events>>(
                                   stream: event.events,
                                   builder: (context, snapshot) {
@@ -128,54 +141,21 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 SizedBox(
                                                   width: 8,
                                                 ),
-                                                Container(
-                                                    constraints: BoxConstraints(
-                                                      minWidth: 18,
-                                                      minHeight: 18,
-                                                    ),
-                                                    padding: EdgeInsets.all(
-                                                        totalUnfinished > 9
-                                                            ? 3
-                                                            : 8),
-                                                    decoration:
-                                                        totalUnfinished > 99
-                                                            ? BoxDecoration(
-                                                                borderRadius: BorderRadius
-                                                                    .all(Radius
-                                                                        .circular(
-                                                                            20)),
-                                                                color: currentPage == 0
-                                                                    ? Colors
-                                                                        .white
-                                                                    : Color
-                                                                        .fromRGBO(
-                                                                            160,
-                                                                            160,
-                                                                            160,
-                                                                            1),
-                                                              )
-                                                            : BoxDecoration(
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                                color: currentPage == 0
-                                                                    ? Colors
-                                                                        .white
-                                                                    : Color
-                                                                        .fromRGBO(
-                                                                            160,
-                                                                            160,
-                                                                            160,
-                                                                            1),
-                                                              ),
-                                                    child: Text(
-                                                      '$totalUnfinished',
-                                                      style: TextStyle(
-                                                          fontSize: 10,
-                                                          color: Color.fromRGBO(
-                                                              48, 48, 48, 1),
-                                                          fontWeight:
-                                                              FontWeight.w600),
-                                                    ))
+                                                Badge(
+                                                  badgeContent: Text(
+                                                    '$totalUnfinished',
+                                                    style: TextStyle(
+                                                        fontSize: 10,
+                                                        color: Color.fromRGBO(
+                                                            48, 48, 48, 1),
+                                                        fontWeight:
+                                                            FontWeight.w600),
+                                                  ),
+                                                  badgeColor: currentPage == 0
+                                                      ? Colors.white
+                                                      : Color.fromRGBO(
+                                                          160, 160, 160, 1),
+                                                ),
                                               ],
                                             ),
                                             Row(
@@ -186,54 +166,21 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 SizedBox(
                                                   width: 8,
                                                 ),
-                                                Container(
-                                                    constraints: BoxConstraints(
-                                                      minWidth: 18,
-                                                      minHeight: 18,
-                                                    ),
-                                                    padding: EdgeInsets.all(
-                                                        totalUnfinished > 9
-                                                            ? 3
-                                                            : 8),
-                                                    decoration:
-                                                        totalUnfinished > 99
-                                                            ? BoxDecoration(
-                                                                borderRadius: BorderRadius
-                                                                    .all(Radius
-                                                                        .circular(
-                                                                            20)),
-                                                                color: currentPage == 1
-                                                                    ? Colors
-                                                                        .white
-                                                                    : Color
-                                                                        .fromRGBO(
-                                                                            160,
-                                                                            160,
-                                                                            160,
-                                                                            1),
-                                                              )
-                                                            : BoxDecoration(
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                                color: currentPage == 1
-                                                                    ? Colors
-                                                                        .white
-                                                                    : Color
-                                                                        .fromRGBO(
-                                                                            160,
-                                                                            160,
-                                                                            160,
-                                                                            1),
-                                                              ),
-                                                    child: Text(
-                                                      '$totalCompleted',
-                                                      style: TextStyle(
-                                                          fontSize: 10,
-                                                          color: Color.fromRGBO(
-                                                              48, 48, 48, 1),
-                                                          fontWeight:
-                                                              FontWeight.w600),
-                                                    ))
+                                                Badge(
+                                                  badgeContent: Text(
+                                                    '$totalCompleted',
+                                                    style: TextStyle(
+                                                        fontSize: 10,
+                                                        color: Color.fromRGBO(
+                                                            48, 48, 48, 1),
+                                                        fontWeight:
+                                                            FontWeight.w600),
+                                                  ),
+                                                  badgeColor: currentPage == 1
+                                                      ? Colors.white
+                                                      : Color.fromRGBO(
+                                                          160, 160, 160, 1),
+                                                ),
                                               ],
                                             ),
                                           ]),

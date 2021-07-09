@@ -9,7 +9,6 @@ import 'package:jadwalku/model/events.dart';
 import 'package:jadwalku/model/users.dart';
 import 'package:jadwalku/pages/discuss_page.dart';
 import 'package:jadwalku/pages/form.dart';
-import 'package:jadwalku/pages/profile.dart';
 import 'package:jadwalku/provider/discussion_provider.dart';
 import 'package:jadwalku/provider/events_provider.dart';
 import 'package:jadwalku/provider/userProvider.dart';
@@ -20,11 +19,14 @@ import 'package:jadwalku/widget/progress_indicator.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:provider/provider.dart';
+import 'package:badges/badges.dart';
 
 class Home extends StatefulWidget {
   final String title;
   final DateTime selDate;
-  const Home({Key key, this.title, this.selDate}) : super(key: key);
+  final int iniTime;
+  const Home({Key key, this.title, this.selDate, this.iniTime})
+      : super(key: key);
 
   @override
   _HomeState createState() => _HomeState();
@@ -34,7 +36,7 @@ class _HomeState extends State<Home> {
   RegUser user;
 
   int count = 0;
-  int time = 6;
+  int time;
   String messageId;
   bool youGotMessage = false;
   String collName;
@@ -43,7 +45,7 @@ class _HomeState extends State<Home> {
   List<int> bookTimeOT = [];
 
   String oTRoom;
-  DateTime _selectedDay/*= DateTime.now()*/;
+  DateTime _selectedDay;
   CalendarController _calendarController = CalendarController();
   CalendarFormat _format = CalendarFormat.week;
   WeekViewController _weekViewController = WeekViewController();
@@ -58,11 +60,21 @@ class _HomeState extends State<Home> {
   void initState() {
     checkDoc();
 
-    _selectedDay = DateTime(
-      DateTime.now().year,
-      DateTime.now().month,
-      DateTime.now().day,
-    );
+    if (widget.selDate != null) {
+      _selectedDay = widget.selDate;
+    } else {
+      _selectedDay = DateTime(
+        DateTime.now().year,
+        DateTime.now().month,
+        DateTime.now().day,
+      );
+    }
+    if (widget.iniTime != null) {
+      time = widget.iniTime;
+    } else {
+      time = 6;
+    }
+
     super.initState();
   }
 
@@ -96,13 +108,11 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.selDate != null) {
-      _selectedDay = widget.selDate;
-    }
     final event = Provider.of<EventProvider>(context);
     final discussion = Provider.of<DiscussionProvider>(context);
-    final person = Provider.of<UserProvider>(context);
+    //final person = Provider.of<UserProvider>(context);
     var now = DateTime.now();
+    print(widget.selDate);
 
     return StreamBuilder<List<Events>>(
         stream: event.events,
@@ -237,10 +247,12 @@ class _HomeState extends State<Home> {
                         time = 6;
                       }
                       _calendarController.setCalendarFormat(_format);
+                      print(day);
                       //time = 6;
                     });
                   },
-                  initialSelectedDay: DateTime.now(),
+                  initialSelectedDay:
+                      widget.selDate != null ? widget.selDate : DateTime.now(),
                   builders: CalendarBuilders(
                     selectedDayBuilder: (context, date, events) => Container(
                         margin: const EdgeInsets.all(8.0),
@@ -273,26 +285,16 @@ class _HomeState extends State<Home> {
                         Positioned(
                           top: -1,
                           right: 0,
-                          child: Container(
-                              constraints: BoxConstraints(
-                                minWidth: 14,
-                                minHeight: 14,
-                              ),
-                              padding: EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  // borderRadius: BorderRadius.circular(7),
-                                  color: Colors.deepOrangeAccent),
-                              child: Center(
-                                child: Text(
-                                  '${_groupedEvents.length}',
-                                  style: TextStyle(
-                                      fontSize: 10,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600),
-                                  textAlign: TextAlign.center,
-                                ),
-                              )),
+                          child: Badge(
+                            badgeContent: Text(
+                              '${_groupedEvents.length}',
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                            badgeColor: Colors.deepOrangeAccent,
+                          ),
                         )
                       ];
                     },
@@ -312,7 +314,7 @@ class _HomeState extends State<Home> {
                   ),
                 ),
                 SizedBox(
-                  height: 5,
+                  height: 10,
                 ),
                 //AD was Here
 
@@ -373,7 +375,7 @@ class _HomeState extends State<Home> {
       ),
       initialTime: _selectedDay.isAtSameMomentAs(now) && todayEvent.isNotEmpty
           ? HourMinute(hour: todayEvent[0]).atDate(now)
-          : HourMinute(hour: time - 1).atDate(_selectedDay),
+          : HourMinute(hour: time).atDate(_selectedDay),
       onDayBarTappedDown: (day) {
         bookTimeOT.clear();
 
@@ -399,8 +401,8 @@ class _HomeState extends State<Home> {
           color: tgl == _selectedDay
               ? Color.fromRGBO(61, 102, 98, 1)
               : Color.fromRGBO(69, 101, 127, 1),
-          textStyle:
-              TextStyle(fontWeight: tgl == today ? FontWeight.w600 : null),
+          textStyle: TextStyle(
+              fontWeight: tgl == today ? FontWeight.w600 : null, fontSize: 12),
           textAlignment:
               tgl != _selectedDay ? Alignment.centerLeft : Alignment.center,
           dateFormatter: tgl != today

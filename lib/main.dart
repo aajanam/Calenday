@@ -14,6 +14,8 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  //For future upgrade
+  /* OneSignal.shared.setAppId("6bc984f5-33ee-469f-b1f4-10ce18d3116b"); */ 
   OneSignal.shared
       .init("6bc984f5-33ee-469f-b1f4-10ce18d3116b", iOSSettings: null);
 
@@ -29,7 +31,8 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState> navigatorKey =
+      new GlobalKey<NavigatorState>();
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {

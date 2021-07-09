@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:badges/badges.dart';
+import 'package:bubble/bubble.dart';
 import 'package:delayed_display/delayed_display.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +21,6 @@ import 'package:jadwalku/widget/progress_indicator.dart';
 import 'package:jadwalku/widget/show_alert_dialogue.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:ionicons/ionicons.dart';
 import 'home.dart';
 
 class NavHome extends StatefulWidget {
@@ -33,40 +34,25 @@ class NavHome extends StatefulWidget {
 class _NavHomeState extends State<NavHome> with RouteAware {
   String messageTitle = '';
   String messageContent = '';
-  //int count = 0;
-  //int time = 6;
   String messageId;
   bool youGotMessage = false;
   String collName;
-  String _status;
+  //String _status;
   String date;
+  String reqName;
+  String time;
 
   @override
   void initState() {
+    /*  OneSignal.shared.setNotificationWillShowInForegroundHandler(
+        (OSNotificationReceivedEvent event) {
+      event.complete(event.notification);
+    }); */
     OneSignal.shared
         .setInFocusDisplayType(OSNotificationDisplayType.notification);
-    OneSignal.shared
-        .setNotificationReceivedHandler((OSNotification notification) {
-      // will be called whenever a notification is received
-      setState(() {
-        messageTitle = notification.payload.title;
-        messageContent = notification.payload.body;
-        if (notification.payload.additionalData['id'] != null) {
-          messageId = notification.payload.additionalData['id'];
-          youGotMessage = true;
-        }
-        if (notification.payload.additionalData['name'] != null) {
-          collName = notification.payload.additionalData['name'];
-        }
-        if (notification.payload.additionalData['name'] != null &&
-            notification.payload.additionalData['status'] != null) {
-          collName = notification.payload.additionalData['name'];
-          _status = notification.payload.additionalData['status'];
-        }
-        if (notification.payload.collapseId != null) {
-          date = notification.payload.collapseId;
-        }
-      });
+
+    OneSignal.shared.setNotificationReceivedHandler((notification) {
+      setState(() {});
       notification.displayType = OSNotificationDisplayType.notification;
     });
 
@@ -76,29 +62,66 @@ class _NavHomeState extends State<NavHome> with RouteAware {
 
       // will be called whenever a notification is opened/button pressed.
       setState(() {
-        date = result.notification.payload.collapseId;
+        date = result.notification.payload.additionalData['date'];
+
+        time = result.notification.payload.additionalData['time'];
+
+        messageTitle = result.notification.payload.title;
+
+        messageContent = result.notification.payload.body;
+
+        collName = result.notification.payload.additionalData['name'];
+
+        messageId = result.notification.payload.additionalData['id'];
+
+        if (messageId != null) {
+          youGotMessage = true;
+        }
       });
     });
 
     super.initState();
   }
 
+  
+
+  /* void initNotifOne(OSNotification notification) {
+    messageTitle = notification.title;
+    messageContent = notification.body;
+    if (notification.additionalData['id'] != null) {
+      messageId = notification.additionalData['id'];
+      youGotMessage = true;
+    }
+    if (notification.additionalData['name'] != null) {
+      collName = notification.additionalData['name'];
+    }
+    if (notification.additionalData['time'] != null) {
+      time = notification.additionalData['time'];
+    }
+    if (notification.additionalData['name'] != null &&
+        notification.additionalData['status'] != null) {
+      collName = notification.additionalData['name'];
+      // _status = notification.additionalData['status'];
+    }
+    date = notification.additionalData['date'];
+  } */
   @override
   Widget build(BuildContext context) {
     final personal = Provider.of<UserProvider>(context);
     final auth = Provider.of<AuthBase>(context, listen: false);
     final discussion = Provider.of<DiscussionProvider>(context);
     final event = Provider.of<EventProvider>(context);
-    print(widget.payload);
-
+    print(date);
+    
     return StreamBuilder<List<RegUser>>(
         stream: personal.users,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+        builder: (context, snp) {
+          if (!snp.hasData) {
             return Indicator();
           }
+
           var person = Auth().currentUser;
-          var data = snapshot?.data
+          var data = snp?.data
               ?.where((element) => element.uid == auth.currentUser.uid);
           return StreamBuilder<List<Events>>(
               stream: event.events,
@@ -125,10 +148,14 @@ class _NavHomeState extends State<NavHome> with RouteAware {
                           stream: discussion.messageList,
                           builder: (context, snap) {
                             if (snap.hasData) {
-                              return FloatingActionButton.extended(
-                                  label: Text('You got message'),
-                                  icon: Icon(Icons.chat),
-                                  backgroundColor: Colors.deepOrange,
+                              return FloatingActionButton(
+                                  child: Icon(
+                                    Icons.chat,
+                                    color: Color.fromRGBO(48, 48, 48, 1),
+                                    size: 32,
+                                  ),
+                                  backgroundColor:
+                                      Color.fromRGBO(240, 230, 140, 1),
                                   onPressed: () async {
                                     await Navigator.push(
                                         context,
@@ -179,53 +206,88 @@ class _NavHomeState extends State<NavHome> with RouteAware {
                               stopPauseOnTap: true,
                             ),
                             DelayedDisplay(
-                              delay: Duration(milliseconds: 2000) ,
+                              delay: Duration(milliseconds: 2000),
                               child: Container(
-                                margin: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                                padding: EdgeInsets.only(bottom: 10, left: 5, top:5),
+                                margin: EdgeInsets.symmetric(
+                                    horizontal: 30, vertical: 15),
+                                padding: EdgeInsets.only(
+                                    bottom: 10, left: 5, top: 5),
                                 decoration: BoxDecoration(
-                                  border: (data.single.specialty == null ||
-                                      data.single.specialty.length < 3) || collName != null || widget.payload != null ?
-                                  Border.all(color: Color.fromRGBO(94, 94, 94, 1)) : null,
-                                  borderRadius: BorderRadius.circular(10)
-                                ),
+                                    border: (data.single.specialty == null ||
+                                                data.single.specialty.length <
+                                                    3) ||
+                                            collName != null ||
+                                            widget.payload != null
+                                        ? Border.all(
+                                            color:
+                                                Color.fromRGBO(94, 94, 94, 1))
+                                        : null,
+                                    borderRadius: BorderRadius.circular(10)),
                                 child: Column(
                                   children: [
                                     data.single.specialty == null ||
-                                        data.single.specialty.length < 3
-                                        ?
-                                    ListTile(
-                                      visualDensity: VisualDensity(vertical: -4) ,
-                                      minVerticalPadding: 0.0,
-                                      leading: Icon(CupertinoIcons.profile_circled, size: 20, color: Colors.yellow.shade100,),
-                                      title: Text('Please complete your profile ',
-                                        style: TextStyle( fontSize: 11,
-                                          color: Colors.yellow.shade100,
-                                        ),),
-                                    ): Container(),
-                                    widget.payload != null ?
-                                    ListTile(
-                                      visualDensity: VisualDensity(vertical: -4) ,
-                                      minVerticalPadding: 0.0,
-                                      leading: Icon(CupertinoIcons.calendar_badge_plus, size: 20, color: Colors.yellow.shade100,),
-                                      title: Text('$messageTitle - $messageContent',
-                                        style: TextStyle( fontSize: 11,
-                                          color: Colors.yellow.shade100,                                        ),),
-                                    ): Container(),
-                                    collName!= null ?
-                                    ListTile(
-                                      visualDensity: VisualDensity(vertical: -4) ,
-                                      minVerticalPadding: 0.0,
-                                      leading: Icon(CupertinoIcons.group, size: 20, color: Colors.yellow.shade100,),
-                                      title: Text('You have colleague request from  $messageContent, add him/her too to your colleague list as well ',
-                                        style: TextStyle( fontSize: 11,
-                                          color: Colors.yellow.shade100,                                        ),),
-                                    ): Container(),
+                                            data.single.specialty.length < 3
+                                        ? ListTile(
+                                            visualDensity:
+                                                VisualDensity(vertical: -4),
+                                            minVerticalPadding: 0.0,
+                                            leading: Icon(
+                                              CupertinoIcons.profile_circled,
+                                              size: 20,
+                                              color: Colors.yellow.shade100,
+                                            ),
+                                            title: Text(
+                                              'Please complete your profile ',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                color: Colors.yellow.shade100,
+                                              ),
+                                            ),
+                                          )
+                                        : Container(),
+                                    showEventNotif()
+                                        ? ListTile(
+                                            visualDensity:
+                                                VisualDensity(vertical: -4),
+                                            minVerticalPadding: 0.0,
+                                            leading: Icon(
+                                              CupertinoIcons
+                                                  .calendar_badge_plus,
+                                              size: 20,
+                                              color: Colors.yellow.shade100,
+                                            ),
+                                            title: Text(
+                                              '$messageTitle - $messageContent',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                color: Colors.yellow.shade100,
+                                              ),
+                                            ),
+                                          )
+                                        : Container(),
+                                    collName != null
+                                        ? ListTile(
+                                            visualDensity:
+                                                VisualDensity(vertical: -4),
+                                            minVerticalPadding: 0.0,
+                                            leading: Icon(
+                                              CupertinoIcons.group,
+                                              size: 20,
+                                              color: Colors.yellow.shade100,
+                                            ),
+                                            title: Text(
+                                              'You have colleague request from  $messageContent, add him/her too to your colleague list as well ',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                color: Colors.yellow.shade100,
+                                              ),
+                                            ),
+                                          )
+                                        : Container(),
                                   ],
                                 ),
                               ),
-                            )/*: Container()*/
-
+                            ) /*: Container()*/
                           ],
                         ),
                         height: 270,
@@ -287,14 +349,22 @@ class _NavHomeState extends State<NavHome> with RouteAware {
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(20)),
                                       onTap: () {
+                                        if (collName != null) {
+                                          setState(() {
+                                            reqName = snp.data
+                                                .firstWhere((element) =>
+                                                    element.uid == collName)
+                                                .displayName;
+                                          });
+                                        }
                                         Navigator.of(context)
                                             .push(MaterialPageRoute(
                                                 builder: (context) => Colleague(
                                                       regUser: data.single,
+                                                      reqName: reqName,
                                                     )));
                                         setState(() {
                                           collName = null;
-                                          date = null;
                                         });
                                       },
                                       splashColor: Colors.black,
@@ -333,23 +403,16 @@ class _NavHomeState extends State<NavHome> with RouteAware {
                                               right: 0,
                                               top: 0,
                                               child: collName != null
-                                                  ? Container(
-                                                      constraints:
-                                                          BoxConstraints(
-                                                        minWidth: 12,
-                                                        minHeight: 12,
-                                                      ),
-                                                      padding:
-                                                          EdgeInsets.all(6),
-                                                      decoration: BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                        color: Colors.pinkAccent
-                                                            .shade400,
-                                                      ),
-                                                      child: Icon(
+                                                  ? Badge(
+                                                      badgeContent: Icon(
                                                         CupertinoIcons.bell,
-                                                        color: Colors.white,
-                                                      ))
+                                                        color: Color.fromRGBO(
+                                                            60, 60, 60, 1),
+                                                      ),
+                                                      badgeColor:
+                                                          Color.fromRGBO(240,
+                                                              230, 140, 0.9),
+                                                    )
                                                   : Container()),
                                         ],
                                       ),
@@ -359,13 +422,26 @@ class _NavHomeState extends State<NavHome> with RouteAware {
                                     child: InkWell(
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(20)),
-                                      onTap: () {
-                                        Navigator.of(context).push(
+                                      onTap: () async {
+                                        await Navigator.push(context,
                                             MaterialPageRoute(
-                                                builder: (context) => Home()));
+                                                builder: (context) {
+                                          if (date != null && time != null) {
+                                            return Home(
+                                              selDate: DateTime.parse(date),
+                                              iniTime: int.parse(time),
+                                            );
+                                          }
+                                          return Home();
+                                        }));
+
                                         setState(() {
+                                          messageTitle = null;
                                           date = null;
+                                          time = null;
                                         });
+
+                                        //messageTitle = null;
                                       },
                                       splashColor: Colors.black,
                                       child: Stack(
@@ -402,25 +478,16 @@ class _NavHomeState extends State<NavHome> with RouteAware {
                                           Positioned(
                                               right: 0,
                                               top: 0,
-                                              child: date != null &&
-                                                      collName == null
-                                                  ? Container(
-                                                      constraints:
-                                                          BoxConstraints(
-                                                        minWidth: 12,
-                                                        minHeight: 12,
+                                              child: showEventNotif()
+                                                  ? Badge(
+                                                      badgeContent: Icon(
+                                                        CupertinoIcons.bell,
+                                                        color: Color.fromRGBO(
+                                                            60, 60, 60, 1),
                                                       ),
-                                                      padding:
-                                                          EdgeInsets.all(6),
-                                                      decoration: BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                        color: Colors
-                                                            .deepOrangeAccent,
-                                                      ),
-                                                      child: Icon(
-                                                        Icons.notifications,
-                                                        color: Colors.white,
-                                                      ))
+                                                      badgeColor:
+                                                          Color.fromRGBO(240,
+                                                              230, 140, 0.9))
                                                   : Container()),
                                         ],
                                       ),
@@ -471,11 +538,34 @@ class _NavHomeState extends State<NavHome> with RouteAware {
                           ]),
                         ),
                       ),
+                      (youGotMessage == true &&
+                          messageId != null) ? Bubble(
+                        margin: BubbleEdges.only(bottom: 18, right: 70),
+                        padding: BubbleEdges.all(10),
+                        borderColor: Colors.yellow.shade100,
+                        nipOffset: 10,
+                        alignment: Alignment.centerRight,
+                        nipWidth: 40,
+                        nipHeight: 10,
+                        nip: BubbleNip.rightTop,
+                        color: Colors.transparent,
+                        child: Text('You got message!',
+                            style: TextStyle(
+                                color: Color.fromRGBO(198, 198, 198, 1)),
+                            textAlign: TextAlign.right),
+                      ) : Container()
                     ],
                   ),
                 );
               });
         });
+  }
+
+  bool showEventNotif() {
+    return messageTitle != null &&
+        (messageTitle.contains('invites') ||
+            messageTitle.contains('rescheduled') ||
+            messageTitle.contains('canceled'));
   }
 
   Future<void> _confirmSignOut(BuildContext context) async {

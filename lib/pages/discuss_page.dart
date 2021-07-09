@@ -1,4 +1,3 @@
-import 'package:admob_flutter/admob_flutter.dart';
 import 'package:bubble/bubble.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_format/date_format.dart';
@@ -9,7 +8,6 @@ import 'package:jadwalku/model/events.dart';
 import 'package:jadwalku/model/users.dart';
 import 'package:jadwalku/provider/discussion_provider.dart';
 import 'package:jadwalku/provider/userProvider.dart';
-import 'package:jadwalku/services/admob.dart';
 import 'package:jadwalku/services/auth.dart';
 import 'package:jadwalku/widget/progress_indicator.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -28,7 +26,6 @@ class DiscussPage extends StatefulWidget {
 
 class _DiscussPageState extends State<DiscussPage> {
   String messageText = '';
-  final ads = AdMobService();
   TextEditingController _messageController = TextEditingController();
 
   @override
@@ -44,7 +41,6 @@ class _DiscussPageState extends State<DiscussPage> {
     }
 
     discussionProvider.loadAll(null);
-    // TODO: implement initState
     super.initState();
   }
 
@@ -95,14 +91,7 @@ class _DiscussPageState extends State<DiscussPage> {
             SizedBox(
               height: 5,
             ),
-            Container(
-              // color:Colors. lightBlue.shade100.withOpacity(0.1),
-              child: Center(
-                child: AdmobBanner(
-                    adUnitId: ads.getBannerAdId(),
-                    adSize: AdmobBannerSize.BANNER),
-              ),
-            ),
+            
             Container(
               margin: EdgeInsets.all(8),
               decoration: BoxDecoration(

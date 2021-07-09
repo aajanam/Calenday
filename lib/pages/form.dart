@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui';
+import 'package:badges/badges.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_format/date_format.dart';
 import 'package:collection/collection.dart';
@@ -25,12 +25,10 @@ import 'package:jadwalku/widget/progress_indicator.dart';
 import 'package:jadwalku/widget/show_alert_dialogue.dart';
 import 'package:multi_image_picker2/multi_image_picker2.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:path/path.dart' as Path;
 import 'package:rich_text_controller/rich_text_controller.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-//import 'package:rich_text_controller/rich_text_controller.dart';
 
 class EventForm extends StatefulWidget {
   final Events event;
@@ -69,8 +67,10 @@ class _EventFormState extends State<EventForm> {
   TextEditingController _procedureController = TextEditingController();
   RichTextController _noteController;
   Map<RegExp, TextStyle> patternUser = {
-    RegExp(r"\B@[a-zA-Z0-9]+\b"):
-        TextStyle(color: Colors.deepPurpleAccent.shade100, fontSize: 12, fontWeight: FontWeight.bold)
+    RegExp(r"\B@[a-zA-Z0-9]+\b"): TextStyle(
+        color: Colors.deepPurpleAccent.shade100,
+        fontSize: 12,
+        fontWeight: FontWeight.bold)
   };
 
   List<int> bookTimeOTAll = [];
@@ -146,14 +146,13 @@ class _EventFormState extends State<EventForm> {
   }
 
   Future sendMessage(
-      playerId, messageTitle, messageBody, collapseId, time) async {
+      playerId, messageTitle, messageBody, date, time) async {
     await OneSignal.shared.postNotification(OSCreateNotification(
         playerIds: [playerId],
         content: messageBody,
         heading: messageTitle,
         sendAfter: DateTime.now().add(Duration(seconds: 30)).toUtc(),
-        collapseId: collapseId,
-        additionalData: {'time': time},
+        additionalData: {'time': time, 'date': date},
         androidSmallIcon: 'ic_launcher',
         androidLargeIcon: 'ic_launcher_round'));
   }
@@ -250,6 +249,8 @@ class _EventFormState extends State<EventForm> {
                                             _formKey.currentState.save();
                                             event.changeStartHour = startHour;
                                             event.changeEndHour = endHour;
+                                            event.changePlace =
+                                                _placeController.text;
                                             event.changeParticipants =
                                                 participants.toList();
                                             if (deletedImages.length > 0) {
@@ -494,24 +495,17 @@ class _EventFormState extends State<EventForm> {
                           ? Positioned(
                               right: 0,
                               top: 3,
-                              child: Container(
-                                  constraints: BoxConstraints(
-                                    minWidth: 14,
-                                    minHeight: 14,
-                                  ),
-                                  padding: EdgeInsets.all(4),
-                                  decoration: new BoxDecoration(
-                                    color: Colors.deepOrangeAccent,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Text(
-                                    '${participants.length - 1}',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600),
-                                    textAlign: TextAlign.center,
-                                  )))
+                              child: Badge(
+                                padding: EdgeInsets.all(4),
+                                badgeContent: Text(
+                                  '${participants.length - 1}',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                badgeColor: Colors.deepOrangeAccent,
+                              ))
                           : Container(),
                       Center(
                           child: Container(
@@ -521,11 +515,10 @@ class _EventFormState extends State<EventForm> {
                             Icons.group_add,
                           ),
                           iconSize: 28,
-                          onPressed: widget != null &&
-                                  _placeController.text.length > 2 &&
+                          onPressed: _placeController.text.length > 2 &&
                                   _procedureController.text.length > 2
-                              ? () {
-                                  Navigator.of(context).push(MaterialPageRoute(
+                              ? ()  {
+                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) => Participants(
                                             regUser: owner,
                                             event: widget.event,
@@ -1045,6 +1038,7 @@ class _EventFormState extends State<EventForm> {
                                           (BuildContext context) => null,
                                       textFieldConfiguration:
                                           TextFieldConfiguration(
+                                            textInputAction: TextInputAction.next,
                                               textCapitalization:
                                                   TextCapitalization.sentences,
                                               style: TextStyle(
@@ -1066,6 +1060,7 @@ class _EventFormState extends State<EventForm> {
                                               cursorColor: Colors.white,
                                               onChanged: (val) {
                                                 setState(() {
+                                                 // _placeController.text = val;
                                                   event.changePlace = val;
                                                 });
                                               },
@@ -1267,14 +1262,14 @@ class _EventFormState extends State<EventForm> {
                                       height: 15,
                                     ),
                                     widget.event != null && isDone == true
-                                        ? TextFormField(cursorColor: Colors.white,
+                                        ? TextFormField(
+                                            cursorColor: Colors.white,
                                             textCapitalization:
                                                 TextCapitalization.sentences,
                                             keyboardType:
                                                 TextInputType.multiline,
                                             controller: _noteController,
-                                            style: TextStyle(
-                                                fontSize: 15),
+                                            style: TextStyle(fontSize: 15),
                                             decoration: InputDecoration(
                                                 focusedBorder:
                                                     UnderlineInputBorder(
@@ -1471,7 +1466,6 @@ class _EventFormState extends State<EventForm> {
           .deviceToken);
     }
     for (var playId in playIds) {
-      print(playId);
       if (playId != null) {
         sendMessage(
             playId,
@@ -1695,11 +1689,8 @@ class _EventFormState extends State<EventForm> {
     for (Asset asset in resultList) {
       final filePath =
           await FlutterAbsolutePath.getAbsolutePath(asset.identifier);
-      final cacheDir = await getTemporaryDirectory();
       var path = File(filePath);
-      var filename = Path.join(cacheDir.path, asset.name);
       files.add(path);
-      print(path);
     }
 
     if (!mounted) return;

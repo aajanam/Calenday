@@ -19,6 +19,7 @@ class _PersonalState extends State<Personal> {
   bool enabled = false;
   String deviceToken;
 
+
   @override
   void initState() {
     super.initState();
@@ -59,7 +60,7 @@ class _PersonalState extends State<Personal> {
                 backgroundColor: Color.fromRGBO(48, 48, 48, 1),
                 bottom: PreferredSize(
                   preferredSize: Size.fromHeight(30),
-                  child: Container(),
+                  child: Container()
                 ),
               ),
               body: SingleChildScrollView(
@@ -79,7 +80,6 @@ class _PersonalState extends State<Personal> {
                             style: TextStyle(
                                 color: Color.fromRGBO(160, 160, 160, 1)),
                           ),
-                          
                           TextFormField(
                             cursorColor: Colors.white,
                             style: TextStyle(
@@ -110,12 +110,14 @@ class _PersonalState extends State<Personal> {
                             height: 15,
                           ),
                           Container(
-                                  height: 3,
-                                  color: enabled == false ? Color.fromRGBO(38, 38, 38, 1): Colors.transparent,
-                                  margin: EdgeInsets.only(bottom: 5),
-                                ),
+                            height: 3,
+                            color: enabled == false
+                                ? Color.fromRGBO(38, 38, 38, 1)
+                                : Colors.transparent,
+                            margin: EdgeInsets.only(bottom: 5),
+                          ),
                           Padding(
-                            padding: const EdgeInsets.only(top:15.0),
+                            padding: const EdgeInsets.only(top: 15.0),
                             child: Text('Work Places:',
                                 style: TextStyle(
                                     color: Color.fromRGBO(160, 160, 160, 1))),

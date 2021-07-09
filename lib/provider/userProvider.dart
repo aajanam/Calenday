@@ -213,6 +213,12 @@ class UserProvider with ChangeNotifier {
     await FirebaseMessaging.instance.getToken().then((token) => deviceToken = token);
     return deviceToken;
   }*/
+//For future update
+  /* Future getPlayerId() async {
+    var status = await OneSignal.shared.getDeviceState();
+    deviceToken = status.userId;
+    return deviceToken;
+  } */
   Future getPlayerId() async {
     var status = await OneSignal.shared.getPermissionSubscriptionState();
     deviceToken = status.subscriptionStatus.userId;
